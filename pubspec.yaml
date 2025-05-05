@@ -1,0 +1,110 @@
+name: app02
+description: "A new Flutter project."
+
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+
+environment:
+  sdk: ^3.7.2
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  animated_text_kit: ^4.2.2
+  cupertino_icons: ^1.0.8
+  flutter_native_splash: ^2.2.8
+  google_fonts: ^6.2.1
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+
+
+
+# Top-Level Konfiguration für flutter_native_splash
+flutter_native_splash:
+      color: "#ffffff"
+      image: assets/Logo/android-chrome-512x512.png
+      android: true
+      ios: true
+      web: false
+
+
+
+flutter:
+  assets:
+    - assets/images/leeren_profilefoto5.png
+    - assets/Logo/android-chrome-512x512.png
+
+
+  
+
+  
+
+  uses-material-design: true
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+  
+
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  #
+  
+
+  
+
