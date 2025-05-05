@@ -1,0 +1,41 @@
+# Flutter build output
+build/
+# Dart & Flutter Tooling
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+
+
+.flutter-plugins-deps
+pubspec.lock
+
+# IDEs
+*.iml
+.idea/
+.vscode/
+
+# macOS Finder
+.DS_Store
+
+# Windows Thumbnails
+Thumbs.db
+
+# Logs
+*.log
+
+# Secrets
+secrets.yaml
+
+# Desktop: nur die Build-Ordner ignorieren, nicht den Quellcode
+linux/flutter/ephemeral/
+windows/runner/Release/
+windows/runner/Debug/
+macos/Flutter/ephemeral/
+
+
+# Plattform-Ordner, die wir nicht tracken
+linux/
+macos/
+web/
+ios/
