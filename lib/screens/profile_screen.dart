@@ -21,7 +21,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.all(6.0),
           child: InkWell(
             onTap: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed('/login');
             },
             child: Container(
               decoration: BoxDecoration(
