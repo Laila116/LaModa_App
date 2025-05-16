@@ -1,8 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 
+import 'home_screen.dart';
 import 'new_password_screen.dart';
-import 'profile_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -157,9 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Hier Login-Logik oder API-Call
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => const ProfileScreen(),
-                        ),
+                        MaterialPageRoute(builder: (_) => const HomeScreen()),
                       );
                     }
                   },
