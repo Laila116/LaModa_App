@@ -20,6 +20,11 @@ dependencies:
   flutter_native_splash: ^2.2.8
   google_fonts: ^6.2.1
   email_validator: ^2.1.16
+  iconsax_flutter: ^1.0.0
+  font_awesome_flutter: ^10.4.0
+  material_design_icons_flutter: ^7.0.7296
+  flutter_feather_icons: ^2.0.0
+
 
 
 
@@ -45,6 +50,19 @@ flutter:
   assets:
     - assets/images/leeren_profilefoto5.png
     - assets/Logo/android-chrome-512x512.png
+    #kategories
+    - assets/icons/Category_icons/mann.png
+    - assets/icons/Category_icons/frau(1).png
+    - assets/icons/Category_icons/kind.png
+    #home
+    - assets/images/home_bild1.jpg
+    - assets/images/home_bild2.jpg
+    - assets/images/home_bild3.jpg
+    - assets/images/home_bild4.jpg
+    - assets/images/home_bild5.jpg
+    - assets/images/home_bild6.jpg
+    - assets/images/home_bild7.jpg
+    - assets/images/home_bild8.jpg
 
 
   
