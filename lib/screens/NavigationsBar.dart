@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'home_screen.dart';
+import 'profile_screen.dart';
+import 'wish_screen.dart';
 
 class NavigationsBar extends StatelessWidget {
   final int selectedIndex;

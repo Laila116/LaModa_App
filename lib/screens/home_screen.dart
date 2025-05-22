@@ -6,6 +6,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'NavigationsBar.dart';
 import 'Product_card.dart';
 import 'clothing_categories_screen.dart';
+import 'profile_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,11 +19,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final CarouselSliderController _controller = CarouselSliderController();
-
+  late final PageController _pageController;
   int _currentImageIndex = 0;
- int  _currentIndex =0;
+  int  _currentIndex =0;
   String query = '';
   String? selectedGender;
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   final List<String> sliderImages = [
     'assets/images/home_bild1.jpg',
@@ -53,19 +66,19 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.only(top: 16),
-        children: [
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 150,
-              autoPlay: false,                 // automatisches Scrollen
-              autoPlayInterval: const Duration(seconds: 5),
-              enlargeCenterPage: true,
-              viewportFraction: 0.9,
-              onPageChanged: (idx, _) {
-                setState(() => _currentImageIndex = idx);
-              },
-            ),
+          padding: const EdgeInsets.only(top: 16),
+          children: [
+            CarouselSlider(
+              options: CarouselOptions(
+                height: 150,
+                autoPlay: false,                 // automatisches Scrollen
+                autoPlayInterval: const Duration(seconds: 5),
+                enlargeCenterPage: true,
+                viewportFraction: 0.9,
+                onPageChanged: (idx, _) {
+                  setState(() => _currentImageIndex = idx);
+                },
+              ),
             items: sliderImages.map((path) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -81,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }).toList(),
           ),
 
-          // Optional: kleine Indikatoren unter dem Slider
+          //kleine Indikatoren unter dem Slider
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: sliderImages.asMap().entries.map((entry) {
@@ -133,7 +146,10 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: NavigationsBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
+       // onTap: (idx) => currentIndex = idx,
+
       ),
+
     );
   }
 }
