@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 
 import 'login_screen.dart';
 
-class CreateAccountPage extends StatefulWidget {
-  const CreateAccountPage({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<CreateAccountPage> createState() => _CreateAccountPageState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _CreateAccountPageState extends State<CreateAccountPage> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   String? _email;
   String? _password;
