@@ -8,7 +8,7 @@ class ProductCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white, // Optional: sonst ist dein Container transparent
+        color: Colors.white,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [BoxShadow(color: Colors.black12)],
       ),
@@ -21,7 +21,7 @@ class ProductCard extends StatelessWidget {
               child: Image.asset(
                 'assets/images/home_bild4.jpg',
                 height: 100,
-                width: double.infinity,
+                width: 180,
                 fit: BoxFit.cover,
               ),
             ),

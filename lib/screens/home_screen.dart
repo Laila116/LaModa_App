@@ -1,19 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
+
+import 'NavigationsBar.dart';
 import 'Product_card.dart';
+import 'clothing_categories_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  final CarouselSliderController _controller = CarouselSliderController();
+
+  int _currentImageIndex = 0;
+ int  _currentIndex =0;
   String query = '';
   String? selectedGender;
+
+  final List<String> sliderImages = [
+    'assets/images/home_bild1.jpg',
+    'assets/images/home_bild2.jpg',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -41,187 +54,85 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: ListView(
         padding: const EdgeInsets.only(top: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                width: double.infinity,
-                height: 150,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/home_bild1.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 0, 8),
-              child: Text(
-                'Category',
-                style: TextStyle(fontSize: 24, color: Colors.black),
-              ),
-            ),
-            _buildCategoryRow(), // <-- hier die Kategorien-Leiste
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 0.75,
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                children: const [
-                  ProductCard(),
-                  ProductCard(),
-                  ProductCard(),
-                  ProductCard(),
-                  ProductCard(),
-                  ProductCard(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            borderRadius: BorderRadius.circular(60),
-            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 15)],
-          ),
-
-          child: NavigationBar(
-            selectedIndex: _currentIndex,
-            onDestinationSelected:
-                (int idx) => setState(() => _currentIndex = idx),
-
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-            elevation: 8,
-            backgroundColor: Colors.transparent,
-            // damit die Container-Farbe durchscheint
-            // hier das neue Indicator-Setup:
-            indicatorColor: Colors.white,
-            indicatorShape: const CircleBorder(),
-            destinations: [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined, size: 34.0, color: Colors.grey),
-                selectedIcon: Icon(Icons.home, size: 34.0, color: Colors.brown),
-                label: '',
-              ),
-              NavigationDestination(
-                icon: Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 34.0,
-                  color: Colors.grey,
-                ),
-                selectedIcon: Icon(
-                  Icons.shopping_cart,
-                  size: 34.0,
-                  color: Colors.brown,
-                ),
-                label: '',
-              ),
-              NavigationDestination(
-                icon: Icon(
-                  Icons.favorite_border,
-                  size: 34.0,
-                  color: Colors.grey,
-                ),
-                selectedIcon: Icon(
-                  Icons.favorite,
-                  size: 34.0,
-                  color: Colors.brown,
-                ),
-                label: '',
-              ),
-              NavigationDestination(
-                icon: Icon(
-                  Icons.shopping_bag_outlined,
-                  size: 34.0,
-                  color: Colors.grey,
-                ),
-                selectedIcon: Icon(
-                  Icons.shopping_bag,
-                  size: 34.0,
-                  color: Colors.brown,
-                ),
-                label: '',
-              ),
-
-              NavigationDestination(
-                icon: Icon(
-                  Icons.person_outline,
-                  size: 34.0,
-                  color: Colors.grey,
-                ),
-                selectedIcon: Icon(
-                  Icons.person,
-                  size: 34.0,
-                  color: Colors.brown,
-                ),
-                label: '',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryRow() {
-    final categories = <Map<String, String>>[
-      {'asset': 'assets/icons/Category_icons/mann.png', 'label': 'Männer'},
-      {'asset': 'assets/icons/Category_icons/frau(1).png', 'label': 'Frauen'},
-      {'asset': 'assets/icons/Category_icons/kind.png', 'label': 'Kinder'},
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
         children: [
-          // Spread-Operator sorgt dafür, dass die Widgets einzeln eingefügt werden
-          ...categories.map((cat) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Container korrekt abschließen
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: Colors.brown.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        cat['asset'] as String,
-                        width: 42,
-                        height: 42,
-                        fit: BoxFit.cover,
-                        color: Colors.brown,
-                      ),
-                    ),
+          CarouselSlider(
+            options: CarouselOptions(
+              height: 150,
+              autoPlay: false,                 // automatisches Scrollen
+              autoPlayInterval: const Duration(seconds: 5),
+              enlargeCenterPage: true,
+              viewportFraction: 0.9,
+              onPageChanged: (idx, _) {
+                setState(() => _currentImageIndex = idx);
+              },
+            ),
+            items: sliderImages.map((path) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    path,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
                   ),
-                  const SizedBox(height: 4),
-                  Text(cat['label']!, style: const TextStyle(fontSize: 12)),
-                ],
-              ),
-            );
-          }).toList(),
+                ),
+              );
+            }).toList(),
+          ),
+
+          // Optional: kleine Indikatoren unter dem Slider
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: sliderImages.asMap().entries.map((entry) {
+              return Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentImageIndex == entry.key
+                      ? Colors.brown
+                      : Colors.grey.shade300,
+                ),
+              );
+            }).toList(),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 20, 0, 8),
+            child: Text(
+              'Category',
+              style: TextStyle(fontSize: 24, color: Colors.black),
+            ),
+          ),
+
+          const BuildCategory(), // <-- hier die Kategorien-Leiste
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 0.75,
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              children: const [
+                ProductCard(),
+                ProductCard(),
+                ProductCard(),
+                ProductCard(),
+                ProductCard(),
+                ProductCard(),
+              ],
+            ),
+          ),
         ],
+      ),
+
+      bottomNavigationBar: NavigationsBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
       ),
     );
   }
