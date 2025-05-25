@@ -25,6 +25,7 @@ dependencies:
   material_design_icons_flutter: ^7.0.7296
   flutter_feather_icons: ^2.0.0
   carousel_slider: ^5.0.0
+  flutter_rating_bar: ^4.0.1
 
 
 
@@ -67,6 +68,10 @@ flutter:
     - assets/images/home_bild6.jpg
     - assets/images/home_bild7.jpg
     - assets/images/home_bild8.jpg
+    - assets/images/home_bild9.jpg
+
+      #review
+    - assets/images/images.jpeg
 
 
   

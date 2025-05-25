@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'arrow_back.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -14,26 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: InkWell(
-            onTap: () {
-              Navigator.of(context).pushReplacementNamed('/login');
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade400, width: 2),
-              ),
-              padding: const EdgeInsets.all(8),
-              child: const Icon(Icons.arrow_back, size: 25, color: Colors.grey),
-            ),
-          ),
-        ),
-      ),
+      appBar: arrowBackAppBar(context, title: 'My Orders'),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(

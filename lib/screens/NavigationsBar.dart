@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
-import 'profile_screen.dart';
-import 'wish_screen.dart';
 
 class NavigationsBar extends StatelessWidget {
   final int selectedIndex;
-  final ValueChanged<int> onDestinationSelected;
+  final ValueChanged<int> onTap;
 
   const NavigationsBar({
     super.key,
     required this.selectedIndex,
-    required this.onDestinationSelected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return NavigationBar(
       selectedIndex: selectedIndex,
-      onDestinationSelected: onDestinationSelected,
-
+      onDestinationSelected: onTap,
       labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       elevation: 8,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent, // oder transparent, je nach Wunsch
       indicatorColor: Colors.white,
       indicatorShape: const CircleBorder(),
-      destinations: [
+      destinations: const [
         NavigationDestination(
           icon: Icon(Icons.home_outlined, size: 34.0, color: Colors.grey),
           selectedIcon: Icon(Icons.home, size: 34.0, color: Colors.brown),
@@ -61,7 +57,6 @@ class NavigationsBar extends StatelessWidget {
           ),
           label: '',
         ),
-
         NavigationDestination(
           icon: Icon(Icons.person_outline, size: 34.0, color: Colors.grey),
           selectedIcon: Icon(Icons.person, size: 34.0, color: Colors.brown),
