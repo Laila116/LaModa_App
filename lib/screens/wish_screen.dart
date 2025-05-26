@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'arrow_back.dart';
 import 'Product_card.dart';
+import 'arrow_back.dart';
 
 class WishlistPage extends StatefulWidget {
   const WishlistPage({Key? key}) : super(key: key);
@@ -82,78 +82,4 @@ class _WishlistPageState extends State<WishlistPage> {
       ),
     );
   }
-}
-
-Widget _buildProductGrid(dynamic items) {
-  return GridView.builder(
-    padding: const EdgeInsets.all(16),
-    itemCount: items.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
-      mainAxisSpacing: 18,
-      crossAxisSpacing: 16,
-      childAspectRatio: 0.65,
-    ),
-    itemBuilder: (context, index) {
-      final item = items[index];
-      return _buildProductCard(item);
-    },
-  );
-}
-
-Widget _buildProductCard(Map<String, dynamic> item) {
-  final img = item['image'] as String;
-  Widget imageWidget;
-  if (img.startsWith('http')) {
-    imageWidget = Image.network(
-      img,
-      height: 160,
-      width: double.infinity,
-      fit: BoxFit.cover,
-    );
-  } else {
-    imageWidget = Image.asset(
-      img,
-      height: 160,
-      width: double.infinity,
-      fit: BoxFit.cover,
-    );
-  }
-  var primaryColor;
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: imageWidget,
-          ),
-          Positioned(
-            top: 8,
-            right: 8,
-            child: CircleAvatar(
-              radius: 16,
-              backgroundColor: Colors.white,
-              child: Icon(Icons.favorite_border, color: primaryColor),
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 8),
-      Text(item['title'], style: const TextStyle(fontWeight: FontWeight.w600)),
-      const SizedBox(height: 4),
-      Row(
-        children: [
-          Text(
-            item['price'],
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-          const Spacer(),
-          const Icon(Icons.star, size: 16, color: Colors.amber),
-          Text(item['rating'].toString()),
-        ],
-      ),
-    ],
-  );
 }

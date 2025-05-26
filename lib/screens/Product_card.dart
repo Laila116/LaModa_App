@@ -1,17 +1,19 @@
 // file: product_card.dart
 import 'package:flutter/material.dart';
 
+import 'Product_details_screen.dart';
+
 class ProductCard extends StatelessWidget {
   /// Titel des Produkts
   final String title;
 
-  /// Preis als String, z.B. "€19.99" oder "$120.00"
+  /// Preis als String
   final String price;
 
   /// Stern-Rating, z.B. 4.5
   final double rating;
 
-  /// Pfad zum lokalen Asset (oder URL)
+  /// Pfad zum lokalen Asset oder Netzbild-URL
   final String imagePath;
 
   /// Farbe für das Herz-Icon
@@ -45,38 +47,56 @@ class ProductCard extends StatelessWidget {
               fit: BoxFit.cover,
             );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: imageWidget,
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.favorite_border, color: favoriteColor),
+    return GestureDetector(
+      onTap: () {
+        // Navigation zum Detail-Screen mit allen Produkt-Daten
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => ProductDetails(
+                  title: title,
+                  price: price,
+                  rating: rating,
+                  imagePath: imagePath,
+                ),
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: imageWidget,
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Text(price, style: const TextStyle(fontWeight: FontWeight.w500)),
-            const Spacer(),
-            const Icon(Icons.star, size: 16, color: Colors.amber),
-            Text(rating.toString()),
-          ],
-        ),
-      ],
+              Positioned(
+                top: 8,
+                right: 8,
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.favorite_border, color: favoriteColor),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Text(price, style: const TextStyle(fontWeight: FontWeight.w500)),
+              const Spacer(),
+              const Icon(Icons.star, size: 16, color: Colors.amber),
+              const SizedBox(width: 4),
+              Text(rating.toString()),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

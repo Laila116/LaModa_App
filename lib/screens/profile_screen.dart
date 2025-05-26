@@ -16,7 +16,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: arrowBackAppBar(context, title: 'My Orders'),
+      appBar: arrowBackAppBar(context, title: 'My Profil'),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(
