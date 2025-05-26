@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'Product_details_screen.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   /// Titel des Produkts
   final String title;
 
@@ -29,20 +29,27 @@ class ProductCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  bool isFavorite = false;
+
+  @override
   Widget build(BuildContext context) {
     // Entscheide automatisch, ob Asset oder Netz-Bild
-    final bool isNetwork = imagePath.startsWith('http');
+    final bool isNetwork = widget.imagePath.startsWith('http');
     final Widget imageWidget =
         isNetwork
             ? Image.network(
-              imagePath,
+              widget.imagePath,
               height: 160,
               width: double.infinity,
               fit: BoxFit.cover,
             )
             : Image.asset(
-              imagePath,
-              height: 160,
+              widget.imagePath,
+              height: 200,
               width: double.infinity,
               fit: BoxFit.cover,
             );
@@ -55,10 +62,10 @@ class ProductCard extends StatelessWidget {
           MaterialPageRoute(
             builder:
                 (context) => ProductDetails(
-                  title: title,
-                  price: price,
-                  rating: rating,
-                  imagePath: imagePath,
+                  title: widget.title,
+                  price: widget.price,
+                  rating: widget.rating,
+                  imagePath: widget.imagePath,
                 ),
           ),
         );
@@ -76,23 +83,41 @@ class ProductCard extends StatelessWidget {
                 top: 8,
                 right: 8,
                 child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.favorite_border, color: favoriteColor),
+                  radius: 25,
+                  backgroundColor: Colors.white70,
+                  child: IconButton(
+                    icon: Icon(
+                      isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border_rounded,
+                      color: isFavorite ? Colors.brown : Colors.brown,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isFavorite = !isFavorite;
+                      });
+                    },
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            widget.title,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: 4),
           Row(
             children: [
-              Text(price, style: const TextStyle(fontWeight: FontWeight.w500)),
+              Text(
+                widget.price,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
               const Spacer(),
               const Icon(Icons.star, size: 16, color: Colors.amber),
               const SizedBox(width: 4),
-              Text(rating.toString()),
+              Text(widget.rating.toString()),
             ],
           ),
         ],

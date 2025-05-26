@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'arrow_back.dart';
 
-class ProductDetails extends StatelessWidget {
+class ProductDetails extends StatefulWidget {
   /// Titel des Produkts
   final String title;
 
@@ -18,6 +18,20 @@ class ProductDetails extends StatelessWidget {
   /// Farbe für das Herz-Icon
   final Color favoriteColor;
 
+  const ProductDetails({
+    Key? key,
+    required this.title,
+    required this.price,
+    required this.rating,
+    required this.imagePath,
+    this.favoriteColor = const Color(0xFF5C3A1A),
+  }) : super(key: key);
+
+  @override
+  State<ProductDetails> createState() => _ProductDetailsState();
+}
+
+class _ProductDetailsState extends State<ProductDetails> {
   final List<String> sizes = ['S', 'M', 'L', 'XL'];
   String selectedSize = 'M';
 
@@ -29,15 +43,6 @@ class ProductDetails extends StatelessWidget {
     Colors.orange,
   ];
   Color _selectedColor = Colors.brown;
-
-  ProductDetails({
-    Key? key,
-    required this.title,
-    required this.price,
-    required this.rating,
-    required this.imagePath,
-    this.favoriteColor = const Color(0xFF5C3A1A),
-  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -54,11 +59,10 @@ class ProductDetails extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      'assets/images/home_bild7.jpg',
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                    child:
+                        widget.imagePath.startsWith('http')
+                            ? Image.network(widget.imagePath, fit: BoxFit.cover)
+                            : Image.asset(widget.imagePath, fit: BoxFit.cover),
                   ),
                   Positioned(
                     top: 15,
@@ -74,9 +78,9 @@ class ProductDetails extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Title & description
-              const Text(
-                'Brown Jacket',
-                style: TextStyle(
+              Text(
+                widget.title,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -86,12 +90,16 @@ class ProductDetails extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    price,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    widget.price,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const Spacer(),
-                  const Icon(Icons.star, size: 16, color: Colors.amber),
-                  Text(rating.toString()),
+                  const Icon(Icons.star, size: 20, color: Colors.amber),
+                  const SizedBox(width: 4),
+                  Text(widget.rating.toString()),
                 ],
               ),
               const SizedBox(height: 8),

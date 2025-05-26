@@ -9,6 +9,7 @@ import 'my_orders.dart';
 import 'profile_screen.dart';
 import 'reviews.dart';
 import 'wish_screen.dart';
+import 'Cart_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body = _buildHomeContent();
         break;
       case 1:
-        body = Reviews();
+        body = CartScreen();
         break;
       case 2:
         body = WishlistPage();

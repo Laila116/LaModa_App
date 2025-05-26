@@ -8,7 +8,7 @@ PreferredSizeWidget arrowBackAppBar(
     backgroundColor: Colors.white,
     elevation: 0,
     leading: Padding(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(1),
       child: InkWell(
         onTap: () {
           Navigator.of(context).pushReplacementNamed('/home');
@@ -18,12 +18,15 @@ PreferredSizeWidget arrowBackAppBar(
             shape: BoxShape.circle,
             border: Border.all(color: Colors.grey.shade400, width: 2),
           ),
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(2),
           child: const Icon(Icons.arrow_back, size: 30, color: Colors.grey),
         ),
       ),
     ),
-    title: Text(title, style: TextStyle(color: Colors.black)),
+    title: Text(
+      title,
+      style: TextStyle(fontFamily: 'Oswald', fontSize: 28, color: Colors.black),
+    ),
     centerTitle: true,
   );
 }

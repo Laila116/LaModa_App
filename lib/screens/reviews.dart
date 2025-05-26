@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-import 'arrow_back.dart';
 import 'my_orders.dart';
 
 class Reviews extends StatelessWidget {
@@ -11,7 +10,35 @@ class Reviews extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: arrowBackAppBar(context, title: 'Reviews '),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Padding(
+          padding: const EdgeInsets.all(1),
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.grey.shade400, width: 2),
+              ),
+              padding: const EdgeInsets.all(2),
+              child: const Icon(Icons.arrow_back, size: 30, color: Colors.grey),
+            ),
+          ),
+        ),
+        title: Text(
+          'Review',
+          style: TextStyle(
+            fontFamily: 'Oswald',
+            fontSize: 28,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(
