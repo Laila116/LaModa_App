@@ -34,6 +34,7 @@ class ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   final List<String> sizes = ['S', 'M', 'L', 'XL'];
   String selectedSize = 'M';
+  bool isFavorite = false;
 
   // Available colors and currently selected color
   final List<Color> colors = [
@@ -50,7 +51,7 @@ class _ProductDetailsState extends State<ProductDetails> {
       backgroundColor: Colors.white,
       appBar: arrowBackAppBar(context, title: 'Product Details'),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,18 +60,42 @@ class _ProductDetailsState extends State<ProductDetails> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child:
-                        widget.imagePath.startsWith('http')
-                            ? Image.network(widget.imagePath, fit: BoxFit.cover)
-                            : Image.asset(widget.imagePath, fit: BoxFit.cover),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child:
+                          widget.imagePath.startsWith('http')
+                              ? Image.network(
+                                widget.imagePath,
+                                width: MediaQuery.of(context).size.width,
+                                fit: BoxFit.cover,
+                              )
+                              : Image.asset(
+                                widget.imagePath,
+                                width: MediaQuery.of(context).size.width,
+                                fit: BoxFit.cover,
+                              ),
+                    ),
                   ),
+
                   Positioned(
-                    top: 15,
-                    right: 15,
+                    top: 12,
+                    right: 12,
                     child: CircleAvatar(
                       radius: 25,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.favorite_border, color: Colors.brown),
+                      backgroundColor: Colors.white70,
+                      child: IconButton(
+                        icon: Icon(
+                          isFavorite
+                              ? Icons.favorite
+                              : Icons.favorite_border_rounded,
+                          color: isFavorite ? Colors.brown : Colors.brown,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isFavorite = !isFavorite;
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -181,6 +206,33 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ),
                   Container(width: 24, height: 24, color: _selectedColor),
                 ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.shopping_bag,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                  label: const Text(
+                    'Add to Cart',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
