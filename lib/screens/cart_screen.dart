@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'arrow_back.dart';
+import '../Widgets/arrow_back.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);

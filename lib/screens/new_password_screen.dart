@@ -1,4 +1,5 @@
-// lib/screens/new_password_screen.dart
+import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NewPassword extends StatefulWidget {
@@ -9,8 +10,10 @@ class NewPassword extends StatefulWidget {
 }
 
 class _NewPasswordState extends State<NewPassword> {
-  bool _obscureNew = true;
-  bool _obscureConfirm = true;
+  String? _email;
+  String? _errorMessage;
+  bool _success = false;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -39,105 +42,117 @@ class _NewPasswordState extends State<NewPassword> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'New Password',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'serif',
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const Text(
-                "Your new password must be different from previously used passwords.",
-              ),
-              const SizedBox(height: 40),
-
-              // Neues Passwort
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text("New Password", style: TextStyle(fontSize: 15)),
-              ),
-              TextFormField(
-                obscureText: _obscureNew,
-                decoration: InputDecoration(
-                  hintText: "Enter your new password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: const BorderSide(
-                      color: Colors.brown,
-                      width: 1.3,
-                    ),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureNew ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    onPressed: () => setState(() => _obscureNew = !_obscureNew),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                const Text(
+                  'Passwort zurücksetzen',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'serif',
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
-
-              // Passwort bestätigen
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Confirm your new password",
-                  style: TextStyle(fontSize: 15),
+                const SizedBox(height: 20),
+                const Text(
+                  "Gib deine registrierte E-Mail-Adresse ein. Du erhältst eine E-Mail mit einem Link, um dein Passwort zurückzusetzen.",
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              TextFormField(
-                obscureText: _obscureConfirm,
-                decoration: InputDecoration(
-                  hintText: "Confirm password",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
-                    borderSide: const BorderSide(
-                      color: Colors.brown,
-                      width: 1.5,
+                const SizedBox(height: 40),
+                TextFormField(
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: "maxman@gmail.com",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Colors.brown),
+                      borderRadius: BorderRadius.circular(40),
                     ),
                   ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureConfirm ? Icons.visibility_off : Icons.visibility,
-                    ),
-                    onPressed:
-                        () =>
-                            setState(() => _obscureConfirm = !_obscureConfirm),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 40),
-
-              // Button
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Hier dein Submit-Logic
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Bitte E-Mail eingeben';
+                    }
+                    if (!EmailValidator.validate(value)) {
+                      return 'Ungültiges E-Mail-Format';
+                    }
+                    return null;
                   },
-                  child: const Text(
-                    "Create new Password",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  onSaved: (value) => _email = value,
+                ),
+                const SizedBox(height: 20),
+
+                // Fehlermeldung oder Erfolg
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.brown,
+                if (_success)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Text(
+                      "E-Mail zum Zurücksetzen wurde gesendet!",
+                      style: const TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        _errorMessage = null;
+                        _success = false;
+                      });
+
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+
+                        try {
+                          await FirebaseAuth.instance.sendPasswordResetEmail(
+                            email: _email!,
+                          );
+                          setState(() => _success = true);
+                        } on FirebaseAuthException catch (e) {
+                          String msg = "Fehler: ${e.message}";
+                          if (e.code == "user-not-found") {
+                            msg = "Diese E-Mail ist nicht registriert.";
+                          }
+                          setState(() => _errorMessage = msg);
+                        } catch (e) {
+                          setState(() => _errorMessage = "Fehler: $e");
+                        }
+                      }
+                    },
+                    child: const Text(
+                      "Passwort zurücksetzen",
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.brown,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'Product_card.dart';
-import 'arrow_back.dart';
+import '../Widgets/arrow_back.dart';
+import '../Widgets/product_card.dart';
 
 class WishlistPage extends StatefulWidget {
   const WishlistPage({Key? key}) : super(key: key);

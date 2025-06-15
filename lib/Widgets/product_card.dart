@@ -1,7 +1,7 @@
 // file: product_card.dart
 import 'package:flutter/material.dart';
 
-import 'Product_details_screen.dart';
+import '../screens/product_details_screen.dart';
 
 class ProductCard extends StatefulWidget {
   /// Titel des Produkts
@@ -43,13 +43,13 @@ class _ProductCardState extends State<ProductCard> {
         isNetwork
             ? Image.network(
               widget.imagePath,
-              height: 160,
+              height: 150,
               width: double.infinity,
               fit: BoxFit.cover,
             )
             : Image.asset(
               widget.imagePath,
-              height: 200,
+              height: 180,
               width: double.infinity,
               fit: BoxFit.cover,
             );

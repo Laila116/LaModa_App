@@ -1,6 +1,8 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -12,10 +14,50 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final AuthService authService = AuthService();
+
+  String? name;
   String? _email;
   String? _password;
   bool _obscurePassword = true; // ← hier
   bool isChecked = false;
+  String? _errorMessage;
+
+  Future<void> registerWithEmail(
+    String name,
+    String email,
+    String password,
+  ) async {
+    try {
+      print("Registriere: $email, $password, $name");
+      await authService.createAccount(email: email, password: password);
+      // Username updaten
+      await authService.UpdateUsername(username: name);
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Registrierung erfolgreich!')));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      String msg = 'Registrierung fehlgeschlagen';
+      if (e.code == 'email-already-in-use') {
+        msg = 'E-Mail ist bereits vergeben.';
+      } else if (e.code == 'weak-password') {
+        msg = 'Passwort zu schwach.';
+      }
+      // Hier detailiertere Fehlermeldung anzeigen:
+      setState(() {
+        _errorMessage = '${e.message ?? msg} (${e.code})';
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +105,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       borderRadius: BorderRadius.circular(40),
                     ),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Bitte Name eingeben';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => name = value,
                 ),
 
                 const SizedBox(height: 15),
@@ -152,7 +201,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       fillColor: MaterialStateProperty.resolveWith<Color>((
                         Set<MaterialState> states,
                       ) {
-                        // wenn ausgewählt, blau, sonst rot
                         if (states.contains(MaterialState.selected)) {
                           return Colors.brown;
                         }
@@ -185,6 +233,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                 const SizedBox(height: 25),
 
+                if (_errorMessage != null) ...[
+                  SizedBox(height: 10),
+                  Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10),
+                ],
+
                 // Sign-Up-Button
                 SizedBox(
                   width: double.infinity,
@@ -200,12 +262,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
                         // Hier Login-Logik oder API-Call
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                          ),
-                        );
+                        if (isChecked) {
+                          registerWithEmail(name!, _email!, _password!);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Bitte bestätige die AGBs!'),
+                            ),
+                          );
+                        }
                       }
                     },
                     child: const Text(
