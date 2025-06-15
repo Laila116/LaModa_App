@@ -57,6 +57,12 @@ flutter:
   assets:
     - assets/images/leeren_profilefoto5.png
     - assets/Logo/android-chrome-512x512.png
+    - assets/Logo/android-chrome-512x512-2.png
+    - assets/Logo/android-chrome-512x512-3.png
+    - assets/Logo/favicon-32x32.png
+    - assets/Logo/favicon2-32x32.png
+    - assets/Logo/favicon3-32x32.png
+    - assets/icons/logout.png
     #kategories
     - assets/icons/Category_icons/mann.png
     - assets/icons/Category_icons/frau(1).png

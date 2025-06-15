@@ -5,7 +5,9 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../Widgets/clothing_categories_screen.dart';
 import '../Widgets/navigationsBar.dart';
 import '../Widgets/product_card.dart';
+import '../services/auth_service.dart';
 import 'cart_screen.dart';
+import 'login_screen.dart';
 import 'my_orders.dart';
 import 'profile_screen.dart';
 import 'wish_screen.dart';
@@ -20,6 +22,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final CarouselSliderController _carouselController =
       CarouselSliderController();
+  final AuthService authService = AuthService();
   int _currentImageIndex = 0;
   int _currentIndex = 0;
   String query = '';
@@ -46,7 +49,82 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(backgroundColor: Colors.white),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        // Logo LINKS
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Image.asset('assets/Logo/favicon3-32x32.png', height: 38),
+        ),
+        // (Optional:) Titel in die Mitte
+        title: const Text(
+          'LaModa',
+          style: TextStyle(color: Colors.brown),
+        ), // oder null
+        centerTitle: true,
+        // Icons RECHTS
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person, color: Colors.brown),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            },
+          ),
+          IconButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+              foregroundColor: MaterialStateProperty.all<Color>(Colors.brown),
+            ),
+            icon: Icon(Icons.logout, color: Colors.brown),
+            onPressed: () async {
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder:
+                    (context) => AlertDialog(
+                      title: const Text('Abmelden?'),
+                      content: const Text(
+                        'Möchtest du dich wirklich abmelden?',
+                      ),
+                      actions: [
+                        TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.brown,
+                            ),
+                            foregroundColor: MaterialStateProperty.all<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Nein'),
+                        ),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.brown,
+                            ),
+                            foregroundColor: MaterialStateProperty.all<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('Ja'),
+                        ),
+                      ],
+                    ),
+              );
+              if (shouldLogout == true) {
+                await authService.signOut(); // <-- Deine Methode!
+                Navigator.of(context).pushReplacementNamed('/home');
+              }
+            },
+          ),
+        ],
+      ),
+
       body: body,
       bottomNavigationBar: NavigationsBar(
         selectedIndex: _currentIndex,
@@ -102,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return ListView(
-      padding: const EdgeInsets.only(top: 1),
+      padding: const EdgeInsets.only(top: 8),
       children: [
         TextField(
           onChanged: (value) => setState(() => query = value),
