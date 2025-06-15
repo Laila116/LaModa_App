@@ -1,6 +1,8 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
 import 'home_screen.dart';
 import 'new_password_screen.dart';
 
@@ -13,8 +15,10 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final AuthService authService = AuthService();
   String? _email;
   String? _password;
+  String? _errorMessage;
   bool _obscurePassword = true; // ← hier
 
   @override
@@ -114,6 +118,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 onSaved: (value) => _password = value,
               ),
+              const SizedBox(height: 5),
+
+              if (_errorMessage != null) ...[
+                SizedBox(height: 10),
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
 
               const SizedBox(height: 5),
 
@@ -151,16 +169,38 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      // Hier Login-Logik oder API-Call
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const HomeScreen()),
-                      );
+
+                      setState(
+                        () => _errorMessage = null,
+                      ); // Vorher immer löschen
+
+                      try {
+                        await authService.signIn(
+                          email: _email!,
+                          password: _password!,
+                        );
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => const HomeScreen()),
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        String msg = "falsche Password oder email adreese!";
+                        if (e.code == 'user-not-found') {
+                          msg = "Kein Nutzer mit dieser E-Mail gefunden.";
+                        } else if (e.code == 'wrong-password') {
+                          msg = "Falsches Passwort!";
+                        }
+                        setState(() => _errorMessage = msg);
+                      } catch (e) {
+                        setState(() => _errorMessage = "Fehler: $e");
+                      }
                     }
                   },
+
                   child: const Text(
                     "Sign In",
                     style: TextStyle(

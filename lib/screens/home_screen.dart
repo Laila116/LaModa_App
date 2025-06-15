@@ -2,14 +2,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import 'NavigationsBar.dart';
-import 'Product_card.dart';
-import 'clothing_categories_screen.dart';
+import '../Widgets/clothing_categories_screen.dart';
+import '../Widgets/navigationsBar.dart';
+import '../Widgets/product_card.dart';
+import 'cart_screen.dart';
 import 'my_orders.dart';
 import 'profile_screen.dart';
-import 'reviews.dart';
 import 'wish_screen.dart';
-import 'Cart_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'arrow_back.dart';
+import '../Widgets/arrow_back.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

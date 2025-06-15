@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "702258040286",
+    "project_id": "applamoda",
+    "storage_bucket": "applamoda.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702258040286:android:deedd71d919d07226c614f",
+        "android_client_info": {
+          "package_name": "com.example.app02"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5lXd_ehMO7CSxHTn8Vwxf5jF-A-9uGO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
