@@ -293,7 +293,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     const Text("have already an account? "),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pushNamed('/login');
+                        Navigator.of(context).pushNamed('/home');
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
