@@ -48,6 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildProfileImage(),
               const SizedBox(height: 30),
               _buildFormFields(),
+              const SizedBox(height: 30),
+              GeldHinzufuegenWidget(),
               const SizedBox(height: 40),
               _buildCompleteProfileButton(),
             ],
@@ -186,6 +188,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(25),
         borderSide: const BorderSide(color: Colors.brown, width: 2),
       ),
+    );
+  }
+}
+
+class GeldHinzufuegenWidget extends StatefulWidget {
+  @override
+  _GeldHinzufuegenWidgetState createState() => _GeldHinzufuegenWidgetState();
+}
+
+class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
+  final TextEditingController _controller = TextEditingController();
+  double _kontostand = 0.0;
+
+  void _geldHinzufuegen() {
+    final eingabe = _controller.text.replaceAll(',', '.');
+    final betrag = double.tryParse(eingabe);
+    if (betrag != null && betrag > 0) {
+      setState(() {
+        _kontostand += betrag;
+        _controller.clear();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bitte gib einen gueltigen Betrag ein.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('Kontostand: ${_kontostand.toStringAsFixed(2)} €', style: TextStyle(fontSize: 20)),
+        SizedBox(height: 10),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 100,
+              child: TextField(
+                controller: _controller,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  labelText: 'Betrag',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            SizedBox(width: 10),
+            ElevatedButton(
+              onPressed: _geldHinzufuegen,
+              child: Text('Hinzufuegen'),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
