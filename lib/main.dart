@@ -12,6 +12,7 @@ import 'screens/profile_screen.dart';
 import 'screens/sign_up_screen.dart';
 import 'screens/splash_screen.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
