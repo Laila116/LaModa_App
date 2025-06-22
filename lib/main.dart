@@ -49,7 +49,6 @@ class MyApp extends StatelessWidget {
             price: args['price'],
             rating: args['rating'],
             imagePath: args['imagePath'],
-            Cname: '',
           );
         },
       },

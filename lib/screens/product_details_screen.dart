@@ -25,7 +25,6 @@ class ProductDetails extends StatefulWidget {
     required this.rating,
     required this.imagePath,
     this.favoriteColor = const Color(0xFF5C3A1A),
-    required String Cname,
   }) : super(key: key);
 
   @override

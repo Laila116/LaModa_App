@@ -66,7 +66,6 @@ class _ProductCardState extends State<ProductCard> {
                   price: widget.price,
                   rating: widget.rating,
                   imagePath: widget.imagePath,
-                  Cname: '',
                 ),
           ),
         );
