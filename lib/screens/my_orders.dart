@@ -2,13 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../Widgets/arrow_back.dart';
 import 'reviews.dart';
-<<<<<<< HEAD
-=======
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
->>>>>>> 99c221c (my_orders-Seite mit Firestore)
 
 class MyOrders extends StatefulWidget {
   const MyOrders({super.key});
