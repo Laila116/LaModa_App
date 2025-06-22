@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../Widgets/arrow_back.dart';
@@ -12,22 +14,7 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final Color primaryColor = const Color(0xFF5C3A1A);
 
-  List<CartItem> cartItems = [
-    CartItem(
-      name: 'Brown Jacket',
-      price: 83.97,
-      size: 'XL',
-      quantity: 1,
-      image: 'assets/images/jacket_brown_man2.jpg',
-    ),
-    CartItem(
-      name: 'Brown Suite',
-      price: 120.00,
-      size: 'XL',
-      quantity: 1,
-      image: 'assets/images/jacket_brown_man2.jpg',
-    ),
-  ];
+  List<CartItem> cartItems = [];
 
   void updateQuantity(int index, int change) {
     setState(() {
@@ -36,7 +23,34 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
-  void removeItem(int index) {
+  @override
+  void initState() {
+    super.initState();
+    loadCartItems();
+  }
+
+  Future<void> removeItem(int index) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final item = cartItems[index];
+
+    await FirebaseFirestore.instance
+        .collection('carts')
+        .doc(user.uid)
+        .collection('items')
+        .where('name', isEqualTo: item.name) // oder nutze itemId wenn du hast
+        .get()
+        .then((snapshot) {
+          for (var doc in snapshot.docs) {
+            doc.reference.delete();
+          }
+        });
+
+    setState(() {
+      cartItems.removeAt(index);
+    });
+
     showDialog(
       context: context,
       builder:
@@ -97,7 +111,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   child: ListTile(
                     leading: Image.asset(
-                      'assets/images/jacket_brown_man2.jpg',
+                      'assets/images/Jackets/jacket_brown_man2.jpg',
                       width: 64,
                       height: 64,
                       fit: BoxFit.cover,
@@ -156,6 +170,7 @@ class _CartScreenState extends State<CartScreen> {
                 summaryRow('Discount', -discount),
                 const Divider(),
                 summaryRow('Total Cost', total, bold: true),
+
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -202,6 +217,34 @@ class _CartScreenState extends State<CartScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> loadCartItems() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .get();
+
+    final items =
+        snapshot.docs.map((doc) {
+          final data = doc.data();
+          return CartItem(
+            name: data['name'],
+            price: data['price'].toDouble(),
+            size: data['size'],
+            quantity: data['quantity'],
+            image: data['image'],
+          );
+        }).toList();
+
+    setState(() {
+      cartItems = items;
+    });
   }
 }
 

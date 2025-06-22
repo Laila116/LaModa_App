@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../Widgets/arrow_back.dart';
@@ -211,7 +213,27 @@ class _ProductDetailsState extends State<ProductDetails> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final user = FirebaseAuth.instance.currentUser;
+                    if (user == null) return;
+
+                    await FirebaseFirestore.instance
+                        .collection('carts')
+                        .doc(user.uid)
+                        .collection('items')
+                        .add({
+                          'name': widget.name,
+                          'price': double.tryParse(widget.price) ?? 0,
+                          'quantity': 1,
+                          'size': selectedSize,
+                          'image': widget.imagePath,
+                          'timestamp': FieldValue.serverTimestamp(),
+                        });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Zum Warenkorb hinzugefügt')),
+                    );
+                  },
                   icon: const Icon(
                     Icons.shopping_bag,
                     size: 28,
