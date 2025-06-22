@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -248,10 +249,18 @@ class _HomeScreenState extends State<HomeScreen> {
               }
 
               final products = snapshot.data!.docs;
-              /*final filteredProducts =
+
+              final filteredProducts =
                   products.where((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+
+                    // Sicherheitsprüfung
+                    if (!data.containsKey('name') ||
+                        !data.containsKey('category'))
+                      return false;
+
                     final name = doc['name'].toString().toLowerCase();
-                    final categories = List<String>.from(doc['category']);
+                    final categories = List<String>.from(data['category']);
                     final matchesSearch = name.contains(query.toLowerCase());
                     final matchesCategory =
                         selectedCategory.isEmpty ||
@@ -263,8 +272,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     return matchesSearch && matchesCategory;
                   }).toList();
 
-
-
               if (filteredProducts.isEmpty) {
                 return Center(
                   child: Text(
@@ -273,11 +280,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 );
               }
-*/
+
               return GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: products.length,
+                itemCount: filteredProducts.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 12,
@@ -285,7 +292,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   childAspectRatio: 0.75,
                 ),
                 itemBuilder: (context, index) {
-                  final product = products[index];
+                  final product =
+                      filteredProducts[index].data() as Map<String, dynamic>;
                   return ProductCard(
                     name: product['name'],
                     price: '${product['price']} €',
