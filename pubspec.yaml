@@ -91,6 +91,9 @@ flutter:
     - assets/images/dress/dress_white_women.jpg
     - assets/images/dress/dress_kids_blau.jpg
 
+    #order
+    - assets/images/home_bild6.jpg
+
 
 
 

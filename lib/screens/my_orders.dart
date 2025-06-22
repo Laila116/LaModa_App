@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../Widgets/arrow_back.dart';
 import 'reviews.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyOrders extends StatefulWidget {
   const MyOrders({super.key});
@@ -42,6 +44,38 @@ class _MyOrdersState extends State<MyOrders> {
       ),
     );
   }
+
+  @override
+  void initState() {
+    super.initState();
+    saveOrderToFirestore(
+      title: "title",
+      size: "XL",
+      qty: 22,
+      price: 21.7,
+      imageLink: "assets/images/home_bild6.jpg",
+    );
+  }
+
+  Future<void> saveOrderToFirestore({
+    required String title,
+    required String size,
+    required int qty,
+    required double price,
+    required String imageLink,
+  }) async {
+    final ordersCollection = FirebaseFirestore.instance.collection('orders');
+
+    await ordersCollection.add({
+      'title': title,
+      'size': size,
+      'qty': qty,
+      'price': price,
+      'imageLink': imageLink,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+
+}
 }
 
 class Items extends StatelessWidget {
@@ -124,3 +158,4 @@ class Items extends StatelessWidget {
     );
   }
 }
+
