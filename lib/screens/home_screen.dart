@@ -13,15 +13,14 @@ import 'profile_screen.dart';
 import 'wish_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final CarouselSliderController _carouselController =
-      CarouselSliderController();
+  final CarouselSliderController _carouselController = CarouselSliderController();
   final AuthService authService = AuthService();
   int _currentImageIndex = 0;
   int _currentIndex = 0;
@@ -35,16 +34,16 @@ class _HomeScreenState extends State<HomeScreen> {
         body = _buildHomeContent();
         break;
       case 1:
-        body = CartScreen();
+        body = const CartScreen();
         break;
       case 2:
-        body = WishlistPage();
+        body = const WishlistPage();
         break;
       case 3:
-        body = MyOrders();
+        body = const MyOrders();
         break;
       default:
-        body = ProfileScreen();
+        body = const ProfileScreen();
     }
 
     return Scaffold(
@@ -52,21 +51,18 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        // Logo LINKS
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Image.asset('assets/Logo/favicon3-32x32.png', height: 38),
         ),
-        // (Optional:) Titel in die Mitte
         title: const Text(
           'LaModa',
           style: TextStyle(color: Colors.brown),
-        ), // oder null
+        ),
         centerTitle: true,
-        // Icons RECHTS
         actions: [
           IconButton(
-            icon: Icon(Icons.person, color: Colors.brown),
+            icon: const Icon(Icons.person, color: Colors.brown),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -78,53 +74,43 @@ class _HomeScreenState extends State<HomeScreen> {
               backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
               foregroundColor: MaterialStateProperty.all<Color>(Colors.brown),
             ),
-            icon: Icon(Icons.logout, color: Colors.brown),
+            icon: const Icon(Icons.logout, color: Colors.brown),
             onPressed: () async {
               final shouldLogout = await showDialog<bool>(
                 context: context,
-                builder:
-                    (context) => AlertDialog(
-                      title: const Text('Abmelden?'),
-                      content: const Text(
-                        'Möchtest du dich wirklich abmelden?',
+                builder: (context) => AlertDialog(
+                  title: const Text('Abmelden?'),
+                  content: const Text('Möchtest du dich wirklich abmelden?'),
+                  actions: [
+                    TextButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.brown),
+                        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
                       ),
-                      actions: [
-                        TextButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.brown,
-                            ),
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text('Nein'),
-                        ),
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.brown,
-                            ),
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                          onPressed: () => Navigator.of(context).pop(true),
-                          child: const Text('Ja'),
-                        ),
-                      ],
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Nein'),
                     ),
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.brown),
+                        foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Ja'),
+                    ),
+                  ],
+                ),
               );
               if (shouldLogout == true) {
-                await authService.signOut(); // <-- Deine Methode!
-                Navigator.of(context).pushReplacementNamed('/home');
+                await authService.signOut();
+                if (mounted) {
+                  Navigator.of(context).pushReplacementNamed('/home');
+                }
               }
             },
           ),
         ],
       ),
-
       body: body,
       bottomNavigationBar: NavigationsBar(
         selectedIndex: _currentIndex,
@@ -133,7 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Ausgelagerter Home-Content für Übersichtlichkeit:
   Widget _buildHomeContent() {
     final sliderImages = [
       'assets/images/home_bild1.jpg',
@@ -154,49 +139,52 @@ class _HomeScreenState extends State<HomeScreen> {
         'image': 'assets/images/home_bild8.jpg',
       },
       {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
+        'title': 'Blue Jacket',
+        'price': '\$95.00',
+        'rating': 4.7,
         'image': 'assets/images/home_bild7.jpg',
       },
       {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
+        'title': 'Gray Suite',
+        'price': '\$110.00',
+        'rating': 4.8,
         'image': 'assets/images/home_bild5.jpg',
       },
       {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
-        'image': 'assets/images/home_bild5.jpg',
+        'title': 'Black Hoodie',
+        'price': '\$75.00',
+        'rating': 4.6,
+        'image': 'assets/images/home_bild6.jpg',
       },
       {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
-        'image': 'assets/images/home_bild9.jpg',
+        'title': 'Winter Coat',
+        'price': '\$150.00',
+        'rating': 4.9,
+        'image': 'assets/images/home_bild4.jpg',
       },
     ];
 
     return ListView(
       padding: const EdgeInsets.only(top: 8),
       children: [
-        TextField(
-          onChanged: (value) => setState(() => query = value),
-          decoration: InputDecoration(
-            hintText: 'Search...',
-            prefixIcon: Icon(Iconsax.search_normal_copy, color: Colors.brown),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: BorderSide(color: Colors.brown, width: 1),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: TextField(
+            onChanged: (value) => setState(() => query = value),
+            decoration: InputDecoration(
+              hintText: 'Search...',
+              prefixIcon: const Icon(Iconsax.search_normal_copy, color: Colors.brown),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: const BorderSide(color: Colors.brown, width: 1),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: Colors.brown, width: 1.4),
+                borderRadius: BorderRadius.circular(40),
+              ),
+              filled: true,
+              fillColor: Colors.white,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.brown, width: 1.4),
-              borderRadius: BorderRadius.circular(40),
-            ),
-            filled: true,
-            fillColor: Colors.white,
           ),
         ),
         const SizedBox(height: 15),
@@ -204,62 +192,77 @@ class _HomeScreenState extends State<HomeScreen> {
           carouselController: _carouselController,
           options: CarouselOptions(
             height: 150,
-            autoPlay: false,
-            autoPlayInterval: Duration(seconds: 5),
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 5),
             enlargeCenterPage: true,
             viewportFraction: 0.9,
             onPageChanged: (idx, _) {
               setState(() => _currentImageIndex = idx);
             },
           ),
-          items:
-              sliderImages.map((path) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      path,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  ),
-                );
-              }).toList(),
+          items: sliderImages.map((path) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.asset(
+                  path,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.image_not_supported, size: 50),
+                    );
+                  },
+                ),
+              ),
+            );
+          }).toList(),
         ),
+        const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:
-              sliderImages.asMap().entries.map((entry) {
-                return Container(
-                  width: 8,
-                  height: 8,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:
-                        _currentImageIndex == entry.key
-                            ? Colors.brown
-                            : Colors.grey.shade300,
-                  ),
-                );
-              }).toList(),
+          children: sliderImages.asMap().entries.map((entry) {
+            return Container(
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentImageIndex == entry.key
+                    ? Colors.brown
+                    : Colors.grey.shade300,
+              ),
+            );
+          }).toList(),
         ),
         const Padding(
-          padding: EdgeInsets.fromLTRB(20, 20, 0, 8),
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
           child: Text(
-            'Category',
-            style: TextStyle(fontSize: 24, color: Colors.black),
+            'Categories',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
         ),
         const BuildCategory(),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
+          child: Text(
+            'Featured Products',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: GridView.builder(
-            // wichtig, damit der GridView in ListView funktioniert
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: products.length,
@@ -280,6 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ),
+        const SizedBox(height: 20),
       ],
     );
   }
