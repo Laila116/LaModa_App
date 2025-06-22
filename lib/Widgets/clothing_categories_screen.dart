@@ -8,6 +8,7 @@ class BuildCategory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categories = <Map<String, String>>[
+      {'asset': 'assets/icons/Category_icons/icon_all.png', 'label': 'getAll'},
       {'asset': 'assets/icons/Category_icons/mann.png', 'label': 'man'},
       {'asset': 'assets/icons/Category_icons/frau(1).png', 'label': 'woman'},
       {'asset': 'assets/icons/Category_icons/kind.png', 'label': 'kids'},

@@ -68,6 +68,7 @@ flutter:
     - assets/icons/Category_icons/jacke(2).png
     - assets/icons/Category_icons/t-shirt_icon-.png
     - assets/icons/Category_icons/icon_pant.png
+    - assets/icons/Category_icons/icon_all.png
     #home
     - assets/images/home_bild1.jpg
     - assets/images/home_bild2.jpg
@@ -85,6 +86,11 @@ flutter:
     - assets/images/t-Shirts/t-shirt_green_kids.jpg
     - assets/images/t-Shirts/t-shirt_white_women.jpg
 
+    - assets/images/dress/dress_beig_women.jpg
+    - assets/images/dress/dress_kids_4farben.webp
+    - assets/images/dress/dress_white_women.jpg
+    - assets/images/dress/dress_kids_blau.jpg
+
 
 
 
@@ -96,54 +102,6 @@ flutter:
 
   
 
-  
-
-  
-
-  
-
-
-  
-
-  
-
-
-  
-
-  
-
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
 
   #
   
