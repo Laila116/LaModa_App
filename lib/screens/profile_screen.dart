@@ -49,6 +49,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 30),
               _buildFormFields(),
               const SizedBox(height: 40),
+              _buildFormFields(),
+              const SizedBox(height: 40),
               _buildCompleteProfileButton(),
             ],
           ),

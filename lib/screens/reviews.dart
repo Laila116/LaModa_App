@@ -1,10 +1,29 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+
+
 
 import 'my_orders.dart';
 
 class Reviews extends StatelessWidget {
   const Reviews({super.key});
+
+  Future<void> uploadReviewToBb() async {
+    try{
+      await FirebaseFirestore.instance.collection("review").add({
+        "comment": "Dein Kommentar hier",
+        "rating": 5,
+        "timestamp": FieldValue.serverTimestamp(),
+        "userId": "user123",
+      });
+      print("Review erfolgreich gespeichert!");
+    } catch (e) {
+      print("Fehler beim Speichern: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
