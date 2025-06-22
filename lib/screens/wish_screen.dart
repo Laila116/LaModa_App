@@ -22,13 +22,13 @@ class _WishlistPageState extends State<WishlistPage> {
       'title': 'Brown Suite',
       'price': '\$120.00',
       'rating': 5.0,
-      'image': 'assets/images/home_bild3.jpg',
+      'image': 'assets/images/jacket_brown_women.jpg',
     },
     {
       'title': 'Brown Suite',
       'price': '\$120.00',
       'rating': 5.0,
-      'image': 'assets/images/home_bild5.jpg',
+      'image': 'assets/images/jacket_beig_women.jpg',
     },
     {
       'title': 'Brown Jacket',
@@ -40,19 +40,19 @@ class _WishlistPageState extends State<WishlistPage> {
       'title': 'Yellow Shirt',
       'price': '\$120.00',
       'rating': 5.0,
-      'image': 'assets/images/home_bild5.jpg',
+      'image': 'assets/images/jacket_beig_women.jpg',
     },
     {
       'title': 'Brown Hoodie',
       'price': '\$83.97',
       'rating': 4.9,
-      'image': 'assets/images/home_bild7.jpg',
+      'image': 'assets/images/jacket_beig_man.jpg',
     },
     {
       'title': 'Fur Jacket',
       'price': '\$120.00',
       'rating': 5.0,
-      'image': 'assets/images/home_bild8.jpg',
+      'image': 'assets/images/jacket_brown_man2.jpg',
     },
   ];
 
@@ -73,7 +73,7 @@ class _WishlistPageState extends State<WishlistPage> {
         itemBuilder: (context, index) {
           final item = items[index];
           return ProductCard(
-            title: item['title'],
+            name: item['title'],
             price: item['price'],
             rating: item['rating'],
             imagePath: item['image'],

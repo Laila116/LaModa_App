@@ -5,7 +5,7 @@ import '../screens/product_details_screen.dart';
 
 class ProductCard extends StatefulWidget {
   /// Titel des Produkts
-  final String title;
+  final String name;
 
   /// Preis als String
   final String price;
@@ -21,7 +21,7 @@ class ProductCard extends StatefulWidget {
 
   const ProductCard({
     Key? key,
-    required this.title,
+    required this.name,
     required this.price,
     required this.rating,
     required this.imagePath,
@@ -62,10 +62,11 @@ class _ProductCardState extends State<ProductCard> {
           MaterialPageRoute(
             builder:
                 (context) => ProductDetails(
-                  title: widget.title,
+                  name: widget.name,
                   price: widget.price,
                   rating: widget.rating,
                   imagePath: widget.imagePath,
+                  Cname: '',
                 ),
           ),
         );
@@ -104,7 +105,7 @@ class _ProductCardState extends State<ProductCard> {
           ),
           const SizedBox(height: 8),
           Text(
-            widget.title,
+            widget.name,
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),

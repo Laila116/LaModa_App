@@ -18,14 +18,14 @@ class _CartScreenState extends State<CartScreen> {
       price: 83.97,
       size: 'XL',
       quantity: 1,
-      image: 'assets/images/home_bild8.jpg',
+      image: 'assets/images/jacket_brown_man2.jpg',
     ),
     CartItem(
       name: 'Brown Suite',
       price: 120.00,
       size: 'XL',
       quantity: 1,
-      image: 'assets/images/home_bild8.jpg',
+      image: 'assets/images/jacket_brown_man2.jpg',
     ),
   ];
 
@@ -97,7 +97,7 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   child: ListTile(
                     leading: Image.asset(
-                      'assets/images/home_bild8.jpg',
+                      'assets/images/jacket_brown_man2.jpg',
                       width: 64,
                       height: 64,
                       fit: BoxFit.cover,

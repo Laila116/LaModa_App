@@ -57,12 +57,7 @@ flutter_native_splash:
 flutter:
   assets:
     - assets/images/leeren_profilefoto5.png
-    - assets/Logo/android-chrome-512x512.png
-    - assets/Logo/android-chrome-512x512-2.png
-    - assets/Logo/android-chrome-512x512-3.png
-    - assets/Logo/favicon-32x32.png
-    - assets/Logo/favicon2-32x32.png
-    - assets/Logo/favicon3-32x32.png
+    - assets/Logo/
     - assets/icons/logout.png
     #kategories
     - assets/icons/Category_icons/mann.png
@@ -71,19 +66,26 @@ flutter:
     - assets/icons/Category_icons/kleid.png
     - assets/icons/Category_icons/jacke(1).png
     - assets/icons/Category_icons/jacke(2).png
+    - assets/icons/Category_icons/t-shirt_icon-.png
+    - assets/icons/Category_icons/icon_pant.png
     #home
     - assets/images/home_bild1.jpg
     - assets/images/home_bild2.jpg
-    - assets/images/home_bild3.jpg
-    - assets/images/home_bild4.jpg
-    - assets/images/home_bild5.jpg
-    - assets/images/home_bild6.jpg
-    - assets/images/home_bild7.jpg
-    - assets/images/home_bild8.jpg
-    - assets/images/home_bild9.jpg
 
-      #review
-    - assets/images/images.jpeg
+    - assets/images/Jackets/jacket_beig_man.jpg
+    - assets/images/Jackets/jacket_beig_women.jpg
+    - assets/images/Jackets/jacket_brown_man2.jpg
+    - assets/images/Jackets/jacket_brown_women.jpg
+    - assets/images/Jackets/jacket_orange_man.jpg
+
+
+    - assets/images/pants/pant-brown_man.jpg
+    - assets/images/pants/pants_beig_women.jpg
+    - assets/images/pants/pants_beig_man.jpg
+    - assets/images/t-Shirts/t-shirt_green_kids.jpg
+    - assets/images/t-Shirts/t-shirt_white_women.jpg
+
+
 
 
   

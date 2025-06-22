@@ -4,7 +4,7 @@ import '../Widgets/arrow_back.dart';
 
 class ProductDetails extends StatefulWidget {
   /// Titel des Produkts
-  final String title;
+  final String name;
 
   /// Preis als String
   final String price;
@@ -20,11 +20,12 @@ class ProductDetails extends StatefulWidget {
 
   const ProductDetails({
     Key? key,
-    required this.title,
+    required this.name,
     required this.price,
     required this.rating,
     required this.imagePath,
     this.favoriteColor = const Color(0xFF5C3A1A),
+    required String Cname,
   }) : super(key: key);
 
   @override
@@ -104,7 +105,7 @@ class _ProductDetailsState extends State<ProductDetails> {
 
               // Title & description
               Text(
-                widget.title,
+                widget.name,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

@@ -45,10 +45,11 @@ class MyApp extends StatelessWidget {
           final args =
               ModalRoute.of(ctx)!.settings.arguments as Map<String, dynamic>;
           return ProductDetails(
-            title: args['title'],
+            name: args['product_name'],
             price: args['price'],
             rating: args['rating'],
             imagePath: args['imagePath'],
+            Cname: '',
           );
         },
       },

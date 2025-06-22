@@ -6,6 +6,7 @@ import '../Widgets/clothing_categories_screen.dart';
 import '../Widgets/navigationsBar.dart';
 import '../Widgets/product_card.dart';
 import '../services/auth_service.dart';
+import '../services/product_service.dart';
 import 'cart_screen.dart';
 import 'login_screen.dart';
 import 'my_orders.dart';
@@ -23,9 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
   final CarouselSliderController _carouselController =
       CarouselSliderController();
   final AuthService authService = AuthService();
+  final ProductService productService = ProductService();
+
   int _currentImageIndex = 0;
   int _currentIndex = 0;
   String query = '';
+  String selectedCategory = ''; // '' = alle
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +59,19 @@ class _HomeScreenState extends State<HomeScreen> {
         // Logo LINKS
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
-          child: Image.asset('assets/Logo/favicon3-32x32.png', height: 38),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              );
+            },
+            child: Image.asset('assets/Logo/favicon3-32x32.png', height: 38),
+          ),
         ),
         // (Optional:) Titel in die Mitte
-        title: const Text(
-          'LaModa',
-          style: TextStyle(color: Colors.brown),
-        ), // oder null
+        title: const Text('LaModa', style: TextStyle(color: Colors.brown)),
+        // oder null
         centerTitle: true,
         // Icons RECHTS
         actions: [
@@ -140,45 +150,6 @@ class _HomeScreenState extends State<HomeScreen> {
       'assets/images/home_bild2.jpg',
     ];
 
-    final List<Map<String, dynamic>> products = [
-      {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
-        'image': 'assets/images/home_bild9.jpg',
-      },
-      {
-        'title': 'Brown Jacket',
-        'price': '\$83.97',
-        'rating': 4.9,
-        'image': 'assets/images/home_bild8.jpg',
-      },
-      {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
-        'image': 'assets/images/home_bild7.jpg',
-      },
-      {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
-        'image': 'assets/images/home_bild5.jpg',
-      },
-      {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
-        'image': 'assets/images/home_bild5.jpg',
-      },
-      {
-        'title': 'Brown Suite',
-        'price': '\$120.00',
-        'rating': 5.0,
-        'image': 'assets/images/home_bild9.jpg',
-      },
-    ];
-
     return ListView(
       padding: const EdgeInsets.only(top: 8),
       children: [
@@ -255,27 +226,73 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(fontSize: 24, color: Colors.black),
           ),
         ),
-        const BuildCategory(),
+        BuildCategory(
+          onCategorySelected: (category) {
+            setState(() {
+              selectedCategory = category;
+            });
+          },
+        ),
+
         Padding(
           padding: const EdgeInsets.all(12),
-          child: GridView.builder(
-            // wichtig, damit der GridView in ListView funktioniert
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: products.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 0.75,
-            ),
-            itemBuilder: (context, index) {
-              final item = products[index];
-              return ProductCard(
-                title: item['title'],
-                price: item['price'],
-                rating: item['rating'],
-                imagePath: item['image'],
+          child: StreamBuilder(
+            stream: productService.getProductsStream(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(child: Text('Fehler: ${snapshot.error}'));
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              final products = snapshot.data!.docs;
+              /*final filteredProducts =
+                  products.where((doc) {
+                    final name = doc['name'].toString().toLowerCase();
+                    final categories = List<String>.from(doc['category']);
+                    final matchesSearch = name.contains(query.toLowerCase());
+                    final matchesCategory =
+                        selectedCategory.isEmpty ||
+                        categories.contains(selectedCategory);
+                    if (kDebugMode) {
+                      print('Kategorie: $selectedCategory | Suche: $query');
+                    }
+
+                    return matchesSearch && matchesCategory;
+                  }).toList();
+
+
+
+              if (filteredProducts.isEmpty) {
+                return Center(
+                  child: Text(
+                    'Keine Produkte gefunden',
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
+                  ),
+                );
+              }
+*/
+              return GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: products.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 0.75,
+                ),
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return ProductCard(
+                    name: product['name'],
+                    price: '${product['price']} €',
+                    rating: product['rating'].toDouble(),
+                    imagePath: product['image'],
+                  );
+                },
               );
             },
           ),
