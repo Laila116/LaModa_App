@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../Widgets/arrow_back.dart';
@@ -201,17 +203,46 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
   final TextEditingController _controller = TextEditingController();
   double _kontostand = 0.0;
 
-  void _geldHinzufuegen() {
+  @override
+  void initState() {
+    super.initState();
+    _ladeKontostand();
+  }
+
+  Future<void> _ladeKontostand() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+    if (snapshot.exists && snapshot.data()!.containsKey('kontostand')) {
+      setState(() {
+        _kontostand = (snapshot.data()!['kontostand'] as num).toDouble();
+      });
+    }
+  }
+
+  void _geldHinzufuegen() async {
     final eingabe = _controller.text.replaceAll(',', '.');
     final betrag = double.tryParse(eingabe);
-    if (betrag != null && betrag > 0) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (betrag != null && betrag > 0 && user != null) {
       setState(() {
         _kontostand += betrag;
         _controller.clear();
       });
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'kontostand': _kontostand,
+      }, SetOptions(merge: true));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bitte gib einen gueltigen Betrag ein.')),
+        SnackBar(content: Text('Bitte gib einen gültigen Betrag ein.')),
       );
     }
   }
@@ -221,8 +252,11 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Kontostand: ${_kontostand.toStringAsFixed(2)} €', style: TextStyle(fontSize: 20)),
-        SizedBox(height: 10),
+        Text(
+          'Kontostand: ${_kontostand.toStringAsFixed(2)} €',
+          style: const TextStyle(fontSize: 20),
+        ),
+        const SizedBox(height: 10),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -230,17 +264,19 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
               width: 100,
               child: TextField(
                 controller: _controller,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
                   labelText: 'Betrag',
                   border: OutlineInputBorder(),
                 ),
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             ElevatedButton(
               onPressed: _geldHinzufuegen,
-              child: Text('Hinzufuegen'),
+              child: const Text('Hinzufügen'),
             ),
           ],
         ),

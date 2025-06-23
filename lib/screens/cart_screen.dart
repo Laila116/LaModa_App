@@ -13,20 +13,80 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final Color primaryColor = const Color(0xFF5C3A1A);
-
   List<CartItem> cartItems = [];
-
-  void updateQuantity(int index, int change) {
-    setState(() {
-      cartItems[index].quantity += change;
-      if (cartItems[index].quantity < 1) cartItems[index].quantity = 1;
-    });
-  }
+  double kontostand = 0.0;
 
   @override
   void initState() {
     super.initState();
     loadCartItems();
+  }
+
+  Future<void> loadCartItems() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .orderBy('timestamp', descending: true)
+            .get();
+
+    final items =
+        snapshot.docs.map((doc) {
+          final data = doc.data();
+          return CartItem(
+            name: data['name'],
+            price: (data['price'] as num).toDouble(),
+            size: data['size'],
+            quantity: data['quantity'],
+            image: data['image'],
+          );
+        }).toList();
+
+    setState(() {
+      cartItems = items;
+    });
+
+    final userDoc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+    if (userDoc.exists && userDoc.data()!.containsKey('kontostand')) {
+      setState(() {
+        kontostand = (userDoc['kontostand'] as num).toDouble();
+      });
+    }
+  }
+
+  void updateQuantity(int index, int change) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final item = cartItems[index];
+    final newQuantity = item.quantity + change;
+    if (newQuantity < 1) return;
+
+    setState(() {
+      cartItems[index].quantity = newQuantity;
+    });
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .where('name', isEqualTo: item.name)
+            .where('size', isEqualTo: item.size)
+            .get();
+
+    for (var doc in snapshot.docs) {
+      doc.reference.update({'quantity': newQuantity});
+    }
   }
 
   Future<void> removeItem(int index) async {
@@ -35,48 +95,22 @@ class _CartScreenState extends State<CartScreen> {
 
     final item = cartItems[index];
 
-    await FirebaseFirestore.instance
-        .collection('carts')
-        .doc(user.uid)
-        .collection('items')
-        .where('name', isEqualTo: item.name) // oder nutze itemId wenn du hast
-        .get()
-        .then((snapshot) {
-          for (var doc in snapshot.docs) {
-            doc.reference.delete();
-          }
-        });
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .where('name', isEqualTo: item.name)
+            .where('size', isEqualTo: item.size)
+            .get();
+
+    for (var doc in snapshot.docs) {
+      await doc.reference.delete();
+    }
 
     setState(() {
       cartItems.removeAt(index);
     });
-
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Remove from Cart?'),
-            content: Text(
-              '${cartItems[index].name} - \$${cartItems[index].price}',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    cartItems.removeAt(index);
-                  });
-                  Navigator.pop(context);
-                },
-                style: TextButton.styleFrom(foregroundColor: primaryColor),
-                child: const Text('Yes, Remove'),
-              ),
-            ],
-          ),
-    );
   }
 
   @override
@@ -100,7 +134,7 @@ class _CartScreenState extends State<CartScreen> {
               itemBuilder: (_, index) {
                 final item = cartItems[index];
                 return Dismissible(
-                  key: Key(item.name),
+                  key: Key(item.name + item.size),
                   direction: DismissDirection.endToStart,
                   onDismissed: (_) => removeItem(index),
                   background: Container(
@@ -111,17 +145,20 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   child: ListTile(
                     leading: Image.asset(
-                      'assets/images/Jackets/jacket_brown_man2.jpg',
+                      item.image,
                       width: 64,
                       height: 64,
                       fit: BoxFit.cover,
+                      errorBuilder:
+                          (context, error, stackTrace) =>
+                              Icon(Icons.broken_image),
                     ),
                     title: Text(
                       item.name,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      'Size: ${item.size}\n\$${item.price.toStringAsFixed(2)}',
+                      'Size: ${item.size} | €${item.price.toStringAsFixed(2)}',
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -149,33 +186,103 @@ class _CartScreenState extends State<CartScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Promo Code',
-                    suffixIcon: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Apply',
-                        style: TextStyle(color: primaryColor),
-                      ),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
                 summaryRow('Sub-Total', subtotal),
                 summaryRow('Delivery Fee', deliveryFee),
                 summaryRow('Discount', -discount),
                 const Divider(),
                 summaryRow('Total Cost', total, bold: true),
+                summaryRow('Guthaben', kontostand, bold: true),
 
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      final user = FirebaseAuth.instance.currentUser;
+                      if (user == null) return;
+
+                      // Berechne Total
+                      double subtotal = cartItems.fold(
+                        0,
+                        (sum, item) => sum + (item.price * item.quantity),
+                      );
+                      double deliveryFee = 25.0;
+                      double discount = 35.0;
+                      double total = subtotal + deliveryFee - discount;
+
+                      // Lade Guthaben
+                      final userDoc =
+                          await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user.uid)
+                              .get();
+                      double kontostand = 0.0;
+
+                      if (userDoc.exists &&
+                          userDoc.data()!.containsKey('kontostand')) {
+                        kontostand =
+                            (userDoc.data()!['kontostand'] as num).toDouble();
+                      }
+
+                      if (kontostand >= total) {
+                        // Guthaben reicht – abziehen
+                        final neuerStand = kontostand - total;
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .update({'kontostand': neuerStand});
+
+                        // Warenkorb leeren
+                        final itemsSnapshot =
+                            await FirebaseFirestore.instance
+                                .collection('carts')
+                                .doc(user.uid)
+                                .collection('items')
+                                .get();
+
+                        for (var doc in itemsSnapshot.docs) {
+                          await doc.reference.delete();
+                        }
+
+                        setState(() {
+                          cartItems.clear();
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Checkout erfolgreich!'),
+                          ),
+                        );
+
+                        // Danach zeige Dialog
+                        await showDialog(
+                          context: context,
+                          builder:
+                              (_) => AlertDialog(
+                                title: const Text('Erfolg!'),
+                                content: const Text(
+                                  'Deine Bestellung wurde erfolgreich aufgegeben.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                        );
+                      } else {
+                        // Nicht genug Geld
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Nicht genug Guthaben: €${kontostand.toStringAsFixed(2)}',
+                            ),
+                          ),
+                        );
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -209,42 +316,15 @@ class _CartScreenState extends State<CartScreen> {
         children: [
           Text(label),
           Text(
-            '\$${value.toStringAsFixed(2)}',
+            '€${value.toStringAsFixed(2)}',
             style: TextStyle(
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+              color: label == 'Guthaben' ? Colors.green : null,
             ),
           ),
         ],
       ),
     );
-  }
-
-  Future<void> loadCartItems() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('carts')
-            .doc(user.uid)
-            .collection('items')
-            .get();
-
-    final items =
-        snapshot.docs.map((doc) {
-          final data = doc.data();
-          return CartItem(
-            name: data['name'],
-            price: data['price'].toDouble(),
-            size: data['size'],
-            quantity: data['quantity'],
-            image: data['image'],
-          );
-        }).toList();
-
-    setState(() {
-      cartItems = items;
-    });
   }
 }
 
