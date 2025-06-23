@@ -71,14 +71,16 @@ class _WishlistPageState extends State<WishlistPage> {
           childAspectRatio: 0.65,
         ),
         itemBuilder: (context, index) {
-          final item = items[index];
-          return ProductCard(
-            name: item['title'],
-            price: item['price'],
-            rating: item['rating'],
-            imagePath: item['image'],
-          );
-        },
+  final item = items[index];
+  return ProductCard(
+    name: item['title'],
+    price: item['price'],
+    rating: item['rating'],
+    imagePath: item['image'],
+    isFavorite: true, // ✅ Herz anzeigen
+  );
+},
+
       ),
     );
   }
