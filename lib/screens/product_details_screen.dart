@@ -223,7 +223,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                         .collection('items')
                         .add({
                           'name': widget.name,
-                          'price': double.tryParse(widget.price) ?? 0,
+                          'price':
+                              double.tryParse(
+                                widget.price.replaceAll(' €', ''),
+                              ) ??
+                              0,
                           'quantity': 1,
                           'size': selectedSize,
                           'image': widget.imagePath,
