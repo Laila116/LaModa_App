@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Widgets/arrow_back.dart';
-import 'reviews.dart';
+import 'reviews.dart'; // Kannst du entfernen, wenn du Reviews hier nicht mehr brauchst
 
 class MyOrders extends StatefulWidget {
   const MyOrders({super.key});
@@ -71,7 +71,7 @@ class _MyOrdersState extends State<MyOrders> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   OrderTile(item: item),
-                                  ReviewList(item: item), // Hier Reviews anzeigen
+                                  // ReviewList entfernt!
                                   const Divider(),
                                 ],
                               ))
@@ -132,60 +132,6 @@ class OrderTile extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class ReviewList extends StatelessWidget {
-  final OrderItem item;
-  const ReviewList({super.key, required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    // StreamBuilder um passende Reviews aus Firestore zu holen
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('reviews')
-          .where('name', isEqualTo: item.name)
-          .where('size', isEqualTo: item.size)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text("Keine Bewertungen vorhanden."),
-          );
-        }
-        final reviews = snapshot.data!.docs;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: reviews.map((doc) {
-              final data = doc.data()! as Map<String, dynamic>;
-              final rating = data['rating'] ?? 0.0;
-              final reviewText = data['reviewText'] ?? "";
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Card(
-                  color: Colors.grey[100],
-                  child: ListTile(
-                    leading: Icon(Icons.star, color: Colors.amber),
-                    title: Text("Bewertung: ${rating.toString()}"),
-                    subtitle: Text(reviewText),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        );
-      },
     );
   }
 }
