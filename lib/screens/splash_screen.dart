@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/Logo/android-chrome-512x512-3.png',
+              'assets/logo/android-chrome-512x512.png',
               width: 120,
               height: 120,
             ),

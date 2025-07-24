@@ -47,7 +47,7 @@ dev_dependencies:
 # Top-Level Konfiguration für flutter_native_splash
 flutter_native_splash:
       color: "#ffffff"
-      image: assets/Logo/android-chrome-512x512.png
+      image: assets/logo/android-chrome-512x512.png
       android: true
       ios: true
       web: false
@@ -57,7 +57,8 @@ flutter_native_splash:
 flutter:
   assets:
     - assets/images/leeren_profilefoto5.png
-    - assets/Logo/
+    - assets/logo/android-chrome-512x512.png
+    - assets/logo/favicon-32x32.png
     - assets/icons/logout.png
     #kategories
     - assets/icons/Category_icons/mann.png
@@ -91,7 +92,7 @@ flutter:
     - assets/images/dress/dress_white_women.jpg
     - assets/images/dress/dress_kids_blau.jpg
 
-    #order
+#order
     - assets/images/home_bild6.jpg
 
 
