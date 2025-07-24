@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-import 'my_orders.dart';
+import 'my_orders.dart'; // Für OrderItem Klasse
 
 class Reviews extends StatefulWidget {
-  const Reviews({super.key});
+  final OrderItem item;
+
+  const Reviews({super.key, required this.item});
 
   @override
   State<Reviews> createState() => _ReviewsState();
@@ -21,19 +23,22 @@ class _ReviewsState extends State<Reviews> {
         'rating': _rating,
         'reviewText': _reviewController.text,
         'timestamp': FieldValue.serverTimestamp(),
-        'size': 'XL',
-        'price': 21.7,
+        'name': widget.item.name,
+        'size': widget.item.size,
+        'quantity': widget.item.quantity,
+        'price': widget.item.price,
+        'image': widget.item.image,
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Review submitted successfully")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Review submitted successfully")),
+      );
       Navigator.pop(context);
     } catch (e) {
       print("Fehler beim Senden der Bewertung: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Failed to submit review")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to submit review")),
+      );
     }
   }
 
@@ -73,14 +78,14 @@ class _ReviewsState extends State<Reviews> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Items(
-                key: Key("a"),
-                title: "Item",
-                size: "XL",
-                qty: 22,
-                price: 21.7,
-                imageLink: "assets/images/home_bild6.jpg",
+              ReviewItemTile(
+                name: widget.item.name,
+                size: widget.item.size,
+                quantity: widget.item.quantity,
+                price: widget.item.price,
+                image: widget.item.image,
               ),
+              const SizedBox(height: 10),
               const Text(
                 "How is your order?",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
@@ -92,8 +97,8 @@ class _ReviewsState extends State<Reviews> {
               ),
               const SizedBox(height: 10),
               RatingBar.builder(
-                itemBuilder:
-                    (context, _) => const Icon(Icons.star, color: Colors.amber),
+                itemBuilder: (context, _) =>
+                    const Icon(Icons.star, color: Colors.amber),
                 onRatingUpdate: (value) {
                   setState(() {
                     _rating = value;
@@ -102,13 +107,14 @@ class _ReviewsState extends State<Reviews> {
               ),
               const Divider(),
               const SizedBox(height: 20),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [Text("Add detailed review")],
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Add detailed review"),
               ),
               const SizedBox(height: 5),
               TextField(
                 controller: _reviewController,
+                maxLines: 4,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Enter here",
@@ -147,6 +153,42 @@ class _ReviewsState extends State<Reviews> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ReviewItemTile extends StatelessWidget {
+  final String name;
+  final String size;
+  final int quantity;
+  final double price;
+  final String image;
+
+  const ReviewItemTile({
+    super.key,
+    required this.name,
+    required this.size,
+    required this.quantity,
+    required this.price,
+    required this.image,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.asset(
+          image,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
+      ),
+      title: Text(name),
+      subtitle: Text('Size: $size | Qty: $quantity'),
+      trailing: Text('€${price.toStringAsFixed(2)}'),
     );
   }
 }
