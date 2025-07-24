@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-import 'my_orders.dart';
-
 class Reviews extends StatefulWidget {
-  const Reviews({super.key});
+  final String orderId;
+
+  const Reviews({super.key, required this.orderId});
 
   @override
   State<Reviews> createState() => _ReviewsState();
@@ -17,23 +17,26 @@ class _ReviewsState extends State<Reviews> {
 
   Future<void> submitReview() async {
     try {
-      await FirebaseFirestore.instance.collection('reviews').add({
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(widget.orderId)
+          .collection('reviews')
+          .add({
         'rating': _rating,
-        'reviewText': _reviewController.text,
+        'comment': _reviewController.text.trim(),
         'timestamp': FieldValue.serverTimestamp(),
-        'size': 'XL',
-        'price': 21.7,
       });
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Review submitted successfully")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Review submitted successfully")),
+      );
+
       Navigator.pop(context);
     } catch (e) {
       print("Fehler beim Senden der Bewertung: $e");
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Failed to submit review")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to submit review")),
+      );
     }
   }
 
@@ -73,35 +76,27 @@ class _ReviewsState extends State<Reviews> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Items(
-                key: Key("a"),
-                title: "Item",
-                size: "XL",
-                qty: 22,
-                price: 21.7,
-                imageLink: "assets/images/home_bild6.jpg",
-              ),
+              const SizedBox(height: 20),
               const Text(
                 "How is your order?",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
               ),
-              const Divider(),
+              const Divider(height: 30),
               const Text(
                 "Your overall rating",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
               ),
               const SizedBox(height: 10),
               RatingBar.builder(
-                itemBuilder:
-                    (context, _) => const Icon(Icons.star, color: Colors.amber),
+                itemBuilder: (context, _) =>
+                    const Icon(Icons.star, color: Colors.amber),
                 onRatingUpdate: (value) {
                   setState(() {
                     _rating = value;
                   });
                 },
               ),
-              const Divider(),
-              const SizedBox(height: 20),
+              const Divider(height: 30),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [Text("Add detailed review")],
@@ -109,13 +104,13 @@ class _ReviewsState extends State<Reviews> {
               const SizedBox(height: 5),
               TextField(
                 controller: _reviewController,
+                maxLines: 5,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: "Enter here",
+                  hintText: "Write something about your order...",
                 ),
               ),
-              const Divider(),
-              const SizedBox(height: 30),
+              const Divider(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -123,7 +118,7 @@ class _ReviewsState extends State<Reviews> {
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[200],
-                      fixedSize: const Size(190, 50),
+                      fixedSize: const Size(160, 50),
                     ),
                     child: const Text(
                       "Cancel",
@@ -134,7 +129,7 @@ class _ReviewsState extends State<Reviews> {
                     onPressed: submitReview,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown,
-                      fixedSize: const Size(190, 50),
+                      fixedSize: const Size(160, 50),
                     ),
                     child: const Text(
                       "Submit",

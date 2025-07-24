@@ -3,11 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-<<<<<<< HEAD
-=======
   cloud_firestore
   firebase_auth
->>>>>>> myorders-firebase
   firebase_core
 )
 
