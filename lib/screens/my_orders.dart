@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../Widgets/arrow_back.dart';
-import 'reviews.dart';
+import 'reviews.dart'; // Kannst du entfernen, wenn du Reviews hier nicht mehr brauchst
 
 class MyOrders extends StatefulWidget {
   const MyOrders({super.key});
@@ -12,145 +13,139 @@ class MyOrders extends StatefulWidget {
 }
 
 class _MyOrdersState extends State<MyOrders> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: arrowBackAppBar(context, title: 'My Orders'),
-
-        body: Padding(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  children: [
-                    Items(
-                      key: Key("a"),
-                      title: "Item",
-                      size: "XL",
-                      qty: 22,
-                      price: 21.7,
-                      imageLink: "assets/images/home_bild6.jpg",
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  List<Order> orders = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    saveOrderToFirestore(
-      title: "title",
-      size: "XL",
-      qty: 22,
-      price: 21.7,
-      imageLink: "assets/images/home_bild6.jpg",
-    );
+
+    loadOrders();
   }
 
-  Future<void> saveOrderToFirestore({
-    required String title,
-    required String size,
-    required int qty,
-    required double price,
-    required String imageLink,
-  }) async {
-    final ordersCollection = FirebaseFirestore.instance.collection('orders');
+  Future<void> loadOrders() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-    await ordersCollection.add({
-      'title': title,
-      'size': size,
-      'qty': qty,
-      'price': price,
-      'imageLink': imageLink,
-      'timestamp': FieldValue.serverTimestamp(),
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('orders')
+            .where('userId', isEqualTo: user.uid)
+            .orderBy('timestamp', descending: true)
+            .get();
+
+    final fetchedOrders =
+        snapshot.docs.map((doc) {
+          final data = doc.data();
+          final items =
+              (data['items'] as List).map((item) {
+                return OrderItem(
+                  name: item['name'],
+                  size: item['size'],
+                  quantity: item['quantity'],
+                  price: (item['price'] as num).toDouble(),
+                  image: item['image'],
+                );
+              }).toList();
+
+          return Order(orderId: doc.id, items: items);
+        }).toList();
+
+    setState(() {
+      orders = fetchedOrders;
+      isLoading = false;
     });
   }
-}
-
-class Items extends StatelessWidget {
-  final String title;
-  final String size;
-  final int qty;
-  final double price;
-  final String imageLink;
-
-  const Items({
-    super.key,
-    required this.title,
-    required this.size,
-    required this.qty,
-    required this.price,
-    required this.imageLink,
-  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(10),
-      child: Column(
+    return Scaffold(
+      appBar: arrowBackAppBar(context, title: 'My Orders'),
+      backgroundColor: Colors.white,
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : orders.isEmpty
+              ? const Center(child: Text("Keine Bestellungen gefunden."))
+              : ListView.builder(
+                itemCount: orders.length,
+                itemBuilder: (_, index) {
+                  final order = orders[index];
+                  return Column(
+                    children:
+                        order.items
+                            .map(
+                              (item) => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  OrderTile(item: item, orderId: order.orderId),
+                                  // ReviewList entfernt!
+                                  const Divider(),
+                                ],
+                              ),
+                            )
+                            .toList(),
+                  );
+                },
+              ),
+    );
+  }
+}
+
+class Order {
+  final String orderId;
+  final List<OrderItem> items;
+  Order({required this.orderId, required this.items});
+}
+
+class OrderItem {
+  final String name;
+  final String size;
+  final int quantity;
+  final double price;
+  final String image;
+
+  OrderItem({
+    required this.name,
+    required this.size,
+    required this.quantity,
+    required this.price,
+    required this.image,
+  });
+}
+
+class OrderTile extends StatelessWidget {
+  final OrderItem item;
+  final String orderId;
+  const OrderTile({super.key, required this.item, required this.orderId});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Image.asset(
+        item.image,
+        width: 60,
+        height: 60,
+        fit: BoxFit.cover,
+      ),
+      title: Text(item.name),
+      subtitle: Text('Size: ${item.size} | Qty: ${item.quantity}'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image(
-                  image: AssetImage(imageLink),
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
+          Text('€${item.price.toStringAsFixed(2)}'),
+          const SizedBox(width: 10),
+          ElevatedButton(
+            child: const Text("Review"),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => Reviews(item: item, orderId: orderId),
                 ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(title),
-                  Text(
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
-                    "Size: $size | | Qty: $qty pcs",
-                  ),
-                  Text(
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                    "$price\$",
-                  ),
-                ],
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const Reviews(orderId: ''),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown,
-                    ),
-                    child: Text(
-                      style: TextStyle(color: Colors.white),
-                      "Leave Review",
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              );
+            },
           ),
-          Divider(),
         ],
       ),
     );

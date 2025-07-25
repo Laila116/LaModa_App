@@ -2,10 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
+import 'my_orders.dart'; // Für OrderItem Klasse
+
 class Reviews extends StatefulWidget {
+  final OrderItem item;
   final String orderId;
 
-  const Reviews({super.key, required this.orderId});
+  const Reviews({super.key, required this.item, required this.orderId});
 
   @override
   State<Reviews> createState() => _ReviewsState();
@@ -25,7 +28,20 @@ class _ReviewsState extends State<Reviews> {
             'rating': _rating,
             'comment': _reviewController.text.trim(),
             'timestamp': FieldValue.serverTimestamp(),
+            'name': widget.item.name,
+            'size': widget.item.size,
+            'quantity': widget.item.quantity,
+            'price': widget.item.price,
+            'image': widget.item.image,
           });
+
+      // 2. Zusätzlich zentral speichern unter /reviews
+      await FirebaseFirestore.instance.collection('reviews').add({
+        'productName': widget.item.name,
+        'rating': _rating,
+        'comment': _reviewController.text.trim(),
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Review submitted successfully")),
@@ -76,7 +92,25 @@ class _ReviewsState extends State<Reviews> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Image.asset(widget.item.image, width: 80),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(widget.item.name),
+                      Text(
+                        "Size: ${widget.item.size} | Qty: ${widget.item.quantity}",
+                      ),
+                      Text("€${widget.item.price}"),
+                    ],
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 10),
+
               const Text(
                 "How is your order?",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
@@ -96,15 +130,18 @@ class _ReviewsState extends State<Reviews> {
                   });
                 },
               ),
-              const Divider(height: 30),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [Text("Add detailed review")],
+
+              const Divider(),
+              const SizedBox(height: 20),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Add detailed review"),
               ),
               const SizedBox(height: 5),
               TextField(
                 controller: _reviewController,
-                maxLines: 5,
+                maxLines: 4,
+
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Write something about your order...",
