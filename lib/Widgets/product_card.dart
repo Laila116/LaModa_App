@@ -1,22 +1,13 @@
 // file: product_card.dart
 import 'package:flutter/material.dart';
-
 import '../screens/product_details_screen.dart';
+import '../services/wishlist_service.dart';
 
 class ProductCard extends StatefulWidget {
-  /// Titel des Produkts
   final String name;
-
-  /// Preis als String
   final String price;
-
-  /// Stern-Rating, z.B. 4.5
   final double rating;
-
-  /// Pfad zum lokalen Asset oder Netzbild-URL
   final String imagePath;
-
-  /// Farbe für das Herz-Icon
   final Color favoriteColor;
 
   const ProductCard({
@@ -33,40 +24,45 @@ class ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<ProductCard> {
-  bool isFavorite = false;
+  final WishlistService _wishlistService = WishlistService();
 
   @override
   Widget build(BuildContext context) {
-    // Entscheide automatisch, ob Asset oder Netz-Bild
+    final product = {
+      'title': widget.name,
+      'price': widget.price,
+      'rating': widget.rating,
+      'image': widget.imagePath,
+    };
+
+    final bool isFavorite = _wishlistService.isInWishlist(product);
+
     final bool isNetwork = widget.imagePath.startsWith('http');
-    final Widget imageWidget =
-        isNetwork
-            ? Image.network(
-              widget.imagePath,
-              height: 150,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            )
-            : Image.asset(
-              widget.imagePath,
-              height: 180,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            );
+    final Widget imageWidget = isNetwork
+        ? Image.network(
+            widget.imagePath,
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          )
+        : Image.asset(
+            widget.imagePath,
+            height: 180,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          );
 
     return GestureDetector(
       onTap: () {
-        // Navigation zum Detail-Screen mit allen Produkt-Daten
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder:
-                (context) => ProductDetails(
-                  name: widget.name,
-                  price: widget.price,
-                  rating: widget.rating,
-                  imagePath: widget.imagePath,
-                ),
+            builder: (context) => ProductDetails(
+              name: widget.name,
+              price: widget.price,
+              rating: widget.rating,
+              imagePath: widget.imagePath,
+            ),
           ),
         );
       },
@@ -90,11 +86,15 @@ class _ProductCardState extends State<ProductCard> {
                       isFavorite
                           ? Icons.favorite
                           : Icons.favorite_border_rounded,
-                      color: isFavorite ? Colors.brown : Colors.brown,
+                      color: widget.favoriteColor,
                     ),
                     onPressed: () {
                       setState(() {
-                        isFavorite = !isFavorite;
+                        if (isFavorite) {
+                          _wishlistService.removeFromWishlist(product);
+                        } else {
+                          _wishlistService.addToWishlist(product);
+                        }
                       });
                     },
                   ),

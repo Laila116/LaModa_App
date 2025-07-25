@@ -24,7 +24,13 @@ class _MyOrdersState extends State<MyOrders> {
 
   Future<void> loadOrders() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      setState(() {
+        orders = [];
+        isLoading = false;
+      });
+      return;
+    }
 
     final snapshot =
         await FirebaseFirestore.instance
@@ -91,6 +97,7 @@ class _MyOrdersState extends State<MyOrders> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   OrderTile(item: item, orderId: order.orderId),
+
                                   // ReviewList entfernt!
                                   const Divider(),
                                 ],
@@ -140,6 +147,7 @@ class OrderTile extends StatelessWidget {
         height: 60,
         fit: BoxFit.cover,
       ),
+
       title: Text(item.name),
       subtitle: Text('Size: ${item.size} | Qty: ${item.quantity}'),
       trailing: Row(
@@ -162,6 +170,7 @@ class OrderTile extends StatelessWidget {
                 fontWeight: FontWeight.w400,
               ),
             ),
+
             onPressed: () {
               Navigator.push(
                 context,

@@ -225,7 +225,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                           'name': widget.name,
                           'price':
                               double.tryParse(
-                                widget.price.replaceAll(' €', ''),
+                                widget.price.replaceAll('€', '').trim(),
                               ) ??
                               0,
                           'quantity': 1,

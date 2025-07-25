@@ -29,7 +29,7 @@ class _CartScreenState extends State<CartScreen> {
             .collection('carts')
             .doc(user.uid)
             .collection('items')
-            .orderBy('timestamp', descending: true)
+            //.orderBy('timestamp', descending: true)
             .get();
 
     final items =
