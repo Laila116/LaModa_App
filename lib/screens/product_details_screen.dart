@@ -299,7 +299,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         reviews.map((doc) {
                           final data = doc.data()! as Map<String, dynamic>;
                           final rating = (data['rating'] ?? 0).toDouble();
-                          final reviewText = data['reviewText'] ?? "";
+                          final reviewText = data['comment'] ?? "";
 
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 6),
