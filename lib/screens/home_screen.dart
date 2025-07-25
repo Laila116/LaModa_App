@@ -1,8 +1,8 @@
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../Widgets/clothing_categories_screen.dart';
 import '../Widgets/navigationsBar.dart';
@@ -58,7 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        // Logo LINKS
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: GestureDetector(
@@ -71,65 +70,86 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset('assets/Logo/favicon3-32x32.png', height: 38),
           ),
         ),
-        // (Optional:) Titel in die Mitte
         title: const Text('LaModa', style: TextStyle(color: Colors.brown)),
-        // oder null
         centerTitle: true,
-        // Icons RECHTS
+
+        // Hier der entscheidende Part mit StreamBuilder:
         actions: [
-          IconButton(
-            icon: Icon(Icons.person, color: Colors.brown),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              final user = snapshot.data;
+
+              if (user == null) {
+                // Nicht angemeldet => Icon
+                return IconButton(
+                  icon: Icon(Icons.person, color: Colors.brown),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    );
+                  },
+                );
+              } else {
+                // Angemeldet => Name anzeigen (displayName oder email)
+                final displayName = user.displayName ?? user.email ?? 'User';
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => ProfileScreen()),
+                        );
+                      },
+                      child: Text(
+                        displayName,
+                        style: const TextStyle(
+                          color: Colors.brown,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
             },
           ),
           IconButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.brown),
-            ),
             icon: Icon(Icons.logout, color: Colors.brown),
             onPressed: () async {
               final shouldLogout = await showDialog<bool>(
                 context: context,
-                builder:
-                    (context) => AlertDialog(
-                      title: const Text('Abmelden?'),
-                      content: const Text(
-                        'Möchtest du dich wirklich abmelden?',
+                builder: (context) => AlertDialog(
+                  title: const Text('Abmelden?'),
+                  content: const Text('Möchtest du dich wirklich abmelden?'),
+                  actions: [
+                    TextButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.brown),
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
                       ),
-                      actions: [
-                        TextButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.brown,
-                            ),
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                          onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text('Nein'),
-                        ),
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              Colors.brown,
-                            ),
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                          onPressed: () => Navigator.of(context).pop(true),
-                          child: const Text('Ja'),
-                        ),
-                      ],
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Nein'),
                     ),
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.brown),
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Ja'),
+                    ),
+                  ],
+                ),
               );
               if (shouldLogout == true) {
-                await authService.signOut(); // <-- Deine Methode!
+                await authService.signOut();
                 Navigator.of(context).pushReplacementNamed('/home');
               }
             },
@@ -145,7 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Ausgelagerter Home-Content für Übersichtlichkeit:
   Widget _buildHomeContent() {
     final sliderImages = [
       'assets/images/home_bild1.jpg',
@@ -185,41 +204,38 @@ class _HomeScreenState extends State<HomeScreen> {
               setState(() => _currentImageIndex = idx);
             },
           ),
-          items:
-              sliderImages.map((path) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset(
-                      path,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  ),
-                );
-              }).toList(),
+          items: sliderImages.map((path) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.asset(
+                  path,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
+              ),
+            );
+          }).toList(),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:
-              sliderImages.asMap().entries.map((entry) {
-                return Container(
-                  width: 8,
-                  height: 8,
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 4,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color:
-                        _currentImageIndex == entry.key
-                            ? Colors.brown
-                            : Colors.grey.shade300,
-                  ),
-                );
-              }).toList(),
+          children: sliderImages.asMap().entries.map((entry) {
+            return Container(
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.symmetric(
+                horizontal: 4,
+                vertical: 8,
+              ),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentImageIndex == entry.key
+                    ? Colors.brown
+                    : Colors.grey.shade300,
+              ),
+            );
+          }).toList(),
         ),
         const Padding(
           padding: EdgeInsets.fromLTRB(20, 20, 0, 8),
@@ -235,7 +251,6 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
         ),
-
         Padding(
           padding: const EdgeInsets.all(12),
           child: StreamBuilder(
@@ -246,35 +261,33 @@ class _HomeScreenState extends State<HomeScreen> {
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               final products = snapshot.data!.docs;
 
-              final filteredProducts =
-                  products.where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
+              final filteredProducts = products.where((doc) {
+                final data = doc.data() as Map<String, dynamic>;
 
-                    // Sicherheitsprüfung
-                    if (!data.containsKey('name') ||
-                        !data.containsKey('category'))
-                      return false;
+                if (!data.containsKey('name') || !data.containsKey('category')) {
+                  return false;
+                }
 
-                    final name = doc['name'].toString().toLowerCase();
-                    final categories = List<String>.from(data['category']);
-                    final matchesSearch = name.contains(query.toLowerCase());
-                    final matchesCategory =
-                        selectedCategory.isEmpty ||
-                        categories.contains(selectedCategory);
-                    if (kDebugMode) {
-                      print('Kategorie: $selectedCategory | Suche: $query');
-                    }
+                final name = doc['name'].toString().toLowerCase();
+                final categories = List<String>.from(data['category']);
+                final matchesSearch = name.contains(query.toLowerCase());
+                final matchesCategory =
+                    selectedCategory.isEmpty || categories.contains(selectedCategory);
 
-                    return matchesSearch && matchesCategory;
-                  }).toList();
+                if (kDebugMode) {
+                  print('Kategorie: $selectedCategory | Suche: $query');
+                }
+
+                return matchesSearch && matchesCategory;
+              }).toList();
 
               if (filteredProducts.isEmpty) {
-                return Center(
+                return const Center(
                   child: Text(
                     'Keine Produkte gefunden',
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
@@ -293,8 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   childAspectRatio: 0.75,
                 ),
                 itemBuilder: (context, index) {
-                  final product =
-                      filteredProducts[index].data() as Map<String, dynamic>;
+                  final product = filteredProducts[index].data() as Map<String, dynamic>;
                   return ProductCard(
                     name: product['name'],
                     price: '${product['price']} €',
