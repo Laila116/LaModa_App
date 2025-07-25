@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../Widgets/arrow_back.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -25,28 +24,31 @@ class _CartScreenState extends State<CartScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('carts')
-        .doc(user.uid)
-        .collection('items')
-        .orderBy('timestamp', descending: true)
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .orderBy('timestamp', descending: true)
+            .get();
 
-    final items = snapshot.docs.map((doc) {
-      final data = doc.data();
-      return CartItem(
-        name: data['name'],
-        price: (data['price'] as num).toDouble(),
-        size: data['size'],
-        quantity: data['quantity'],
-        image: data['image'],
-      );
-    }).toList();
+    final items =
+        snapshot.docs.map((doc) {
+          final data = doc.data();
+          return CartItem(
+            name: data['name'],
+            price: (data['price'] as num).toDouble(),
+            size: data['size'],
+            quantity: data['quantity'],
+            image: data['image'],
+          );
+        }).toList();
 
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
+    final userDoc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
     if (userDoc.exists && userDoc.data()!.containsKey('kontostand')) {
       setState(() {
@@ -68,13 +70,14 @@ class _CartScreenState extends State<CartScreen> {
       cartItems[index].quantity = newQuantity;
     });
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('carts')
-        .doc(user.uid)
-        .collection('items')
-        .where('name', isEqualTo: item.name)
-        .where('size', isEqualTo: item.size)
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .where('name', isEqualTo: item.name)
+            .where('size', isEqualTo: item.size)
+            .get();
 
     for (var doc in snapshot.docs) {
       doc.reference.update({'quantity': newQuantity});
@@ -87,13 +90,14 @@ class _CartScreenState extends State<CartScreen> {
 
     final item = cartItems[index];
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('carts')
-        .doc(user.uid)
-        .collection('items')
-        .where('name', isEqualTo: item.name)
-        .where('size', isEqualTo: item.size)
-        .get();
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection('carts')
+            .doc(user.uid)
+            .collection('items')
+            .where('name', isEqualTo: item.name)
+            .where('size', isEqualTo: item.size)
+            .get();
 
     for (var doc in snapshot.docs) {
       await doc.reference.delete();
@@ -106,14 +110,29 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double subtotal = cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
+    double subtotal = cartItems.fold(
+      0,
+      (sum, item) => sum + (item.price * item.quantity),
+    );
     double deliveryFee = 25.0;
-    double discount = 35.0;
-    double total = subtotal + deliveryFee - discount;
+    //double discount = 35.0;
+    double total = subtotal + deliveryFee /*- discount */;
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: arrowBackAppBar(context, title: 'My Cart'),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+
+        title: const Text(
+          'My Cart',
+          style: TextStyle(
+            fontFamily: 'Oswald',
+            fontSize: 28,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           Expanded(
@@ -122,14 +141,14 @@ class _CartScreenState extends State<CartScreen> {
               itemBuilder: (_, index) {
                 final item = cartItems[index];
                 return Dismissible(
-                  key: Key(item.name + item.size),
+                  key: Key('${item.name}_${item.size}_${item.image}'),
                   direction: DismissDirection.endToStart,
                   onDismissed: (_) => removeItem(index),
                   background: Container(
                     alignment: Alignment.centerRight,
-                    color: Colors.red.shade100,
+                    color: Colors.brown.shade100,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.delete, color: Colors.red),
+                    child: const Icon(Icons.delete, color: Colors.brown),
                   ),
                   child: ListTile(
                     leading: Image.asset(
@@ -139,8 +158,13 @@ class _CartScreenState extends State<CartScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
                     ),
-                    title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('Size: ${item.size} | €${item.price.toStringAsFixed(2)}'),
+                    title: Text(
+                      item.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      'Size: ${item.size} | €${item.price.toStringAsFixed(2)}',
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -155,6 +179,53 @@ class _CartScreenState extends State<CartScreen> {
                           onPressed: () => updateQuantity(index, 1),
                           color: primaryColor,
                         ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.brown),
+                          tooltip: 'Löschen',
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder:
+                                  (_) => AlertDialog(
+                                    backgroundColor: Colors.brown[50],
+                                    title: const Text(
+                                      'Wirklich löschen?',
+                                      style: TextStyle(
+                                        color: Colors.brown, // Titel-Farbe
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    content: const Text(
+                                      'Willst du dieses Produkt aus dem Warenkorb entfernen?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed:
+                                            () => Navigator.of(context).pop(),
+                                        child: const Text(
+                                          'Abbrechen',
+                                          style: TextStyle(color: Colors.grey),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          removeItem(index);
+                                        },
+                                        child: const Text(
+                                          'Löschen',
+                                          style: TextStyle(
+                                            color: Colors.red, // Löschen-Farbe
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -168,11 +239,11 @@ class _CartScreenState extends State<CartScreen> {
             child: Column(
               children: [
                 summaryRow('Sub-Total', subtotal),
-                summaryRow('Delivery Fee', deliveryFee),
-                summaryRow('Discount', -discount),
+                summaryRow('Delivery ', deliveryFee),
+                //summaryRow('Discount', -discount),
                 const Divider(),
                 summaryRow('Total Cost', total, bold: true),
-                summaryRow('Guthaben', kontostand, bold: true),
+                summaryRow('Your Credit', kontostand, bold: true),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -189,26 +260,33 @@ class _CartScreenState extends State<CartScreen> {
                             .update({'kontostand': neuerStand});
 
                         // Bestellung speichern
-                        final ordersCollection = FirebaseFirestore.instance.collection('orders');
+                        final ordersCollection = FirebaseFirestore.instance
+                            .collection('orders');
                         await ordersCollection.add({
                           'userId': user.uid,
                           'timestamp': FieldValue.serverTimestamp(),
                           'total': total,
-                          'items': cartItems.map((item) => {
-                            'name': item.name,
-                            'price': item.price,
-                            'size': item.size,
-                            'quantity': item.quantity,
-                            'image': item.image,
-                          }).toList(),
+                          'items':
+                              cartItems
+                                  .map(
+                                    (item) => {
+                                      'name': item.name,
+                                      'price': item.price,
+                                      'size': item.size,
+                                      'quantity': item.quantity,
+                                      'image': item.image,
+                                    },
+                                  )
+                                  .toList(),
                         });
 
                         // Warenkorb leeren
-                        final itemsSnapshot = await FirebaseFirestore.instance
-                            .collection('carts')
-                            .doc(user.uid)
-                            .collection('items')
-                            .get();
+                        final itemsSnapshot =
+                            await FirebaseFirestore.instance
+                                .collection('carts')
+                                .doc(user.uid)
+                                .collection('items')
+                                .get();
 
                         for (var doc in itemsSnapshot.docs) {
                           await doc.reference.delete();
@@ -219,30 +297,40 @@ class _CartScreenState extends State<CartScreen> {
                         });
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Checkout erfolgreich!')),
+                          const SnackBar(
+                            content: Text('Checkout erfolgreich!'),
+                          ),
                         );
 
                         await showDialog(
                           context: context,
-                          builder: (_) => AlertDialog(
-                            title: const Text('Erfolg!'),
-                            content: const Text('Deine Bestellung wurde erfolgreich aufgegeben.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('OK'),
+                          builder:
+                              (_) => AlertDialog(
+                                title: const Text('Erfolg!'),
+                                content: const Text(
+                                  'Deine Bestellung wurde erfolgreich aufgegeben.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Nicht genug Guthaben: €${kontostand.toStringAsFixed(2)}')),
+                          SnackBar(
+                            content: Text(
+                              'Nicht genug Guthaben: €${kontostand.toStringAsFixed(2)}',
+                            ),
+                          ),
                         );
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
+                      backgroundColor: Colors.brown,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -250,7 +338,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                     child: const Text(
                       'Proceed to Checkout',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
+                      style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                   ),
                 ),
@@ -273,7 +361,7 @@ class _CartScreenState extends State<CartScreen> {
             '€${value.toStringAsFixed(2)}',
             style: TextStyle(
               fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-              color: label == 'Guthaben' ? Colors.green : null,
+              color: label == 'Your Credit' ? Colors.green : null,
             ),
           ),
         ],

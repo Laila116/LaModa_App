@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../Widgets/arrow_back.dart';
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -33,7 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: arrowBackAppBar(context, title: 'My Profil'),
+      appBar: AppBar(backgroundColor: Colors.white),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(
@@ -45,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'Complete Your Profile',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'serif',
+                  fontFamily: 'Oswald',
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -56,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 "Don't worry only you can see your personal data.\nNo one else will be able to see it.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'serif',
+                  fontFamily: 'Oswald',
                   fontSize: 16,
                   color: Colors.grey,
                 ),
@@ -157,7 +155,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
 
           // NEU: Hausnummer
-          const Text('Hausnummer', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            'Hausnummer',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _houseNumberController,
@@ -169,7 +170,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
 
           // NEU: Postleitzahl
-          const Text('Postleitzahl', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            'Postleitzahl',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 8),
           TextField(
             keyboardType: TextInputType.number,
@@ -342,7 +346,23 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
             const SizedBox(width: 10),
             ElevatedButton(
               onPressed: _geldHinzufuegen,
-              child: const Text('Hinzufügen'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.brown[50], // hellbraun
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'Hinzufügen',
+                style: TextStyle(
+                  color: Colors.brown, // Löschen-Farbe
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),

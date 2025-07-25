@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../Widgets/arrow_back.dart';
 import 'reviews.dart'; // Kannst du entfernen, wenn du Reviews hier nicht mehr brauchst
 
 class MyOrders extends StatefulWidget {
@@ -60,7 +59,20 @@ class _MyOrdersState extends State<MyOrders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: arrowBackAppBar(context, title: 'My Orders'),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+
+        title: const Text(
+          'My Order',
+          style: TextStyle(
+            fontFamily: 'Oswald',
+            fontSize: 28,
+            color: Colors.black,
+          ),
+        ),
+        centerTitle: true,
+      ),
+
       backgroundColor: Colors.white,
       body:
           isLoading
@@ -136,7 +148,20 @@ class OrderTile extends StatelessWidget {
           Text('€${item.price.toStringAsFixed(2)}'),
           const SizedBox(width: 10),
           ElevatedButton(
-            child: const Text("Review"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.brown,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            child: const Text(
+              "Review",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 19,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
             onPressed: () {
               Navigator.push(
                 context,

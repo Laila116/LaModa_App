@@ -59,23 +59,10 @@ class _ReviewsState extends State<Reviews> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(1),
-          child: InkWell(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade400, width: 2),
-              ),
-              padding: const EdgeInsets.all(2),
-              child: const Icon(Icons.arrow_back, size: 30, color: Colors.grey),
-            ),
-          ),
-        ),
+
         title: const Text(
           'Review',
           style: TextStyle(
@@ -118,7 +105,7 @@ class _ReviewsState extends State<Reviews> {
               const Divider(height: 30),
               const Text(
                 "Your overall rating",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
               ),
               const SizedBox(height: 10),
               RatingBar.builder(
@@ -135,7 +122,10 @@ class _ReviewsState extends State<Reviews> {
               const SizedBox(height: 20),
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Add detailed review"),
+                child: Text(
+                  "Add detailed review",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                ),
               ),
               const SizedBox(height: 5),
               TextField(
@@ -155,7 +145,7 @@ class _ReviewsState extends State<Reviews> {
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[200],
-                      fixedSize: const Size(160, 50),
+                      fixedSize: const Size(180, 50),
                     ),
                     child: const Text(
                       "Cancel",
@@ -166,7 +156,7 @@ class _ReviewsState extends State<Reviews> {
                     onPressed: submitReview,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown,
-                      fixedSize: const Size(160, 50),
+                      fixedSize: const Size(180, 50),
                     ),
                     child: const Text(
                       "Submit",
