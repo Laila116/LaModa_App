@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../Widgets/arrow_back.dart';
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -33,7 +31,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: arrowBackAppBar(context, title: 'My Profil'),
+      // AppBar entfernt
+
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(
@@ -41,11 +40,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
+
+              // Angepasster Header "My Profil"
+              const Text(
+                'My Profil',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Montserrat',
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // dunkles Braun
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
               const Text(
                 'Complete Your Profile',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'serif',
+                  fontFamily: 'Montserrat',
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -56,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 "Don't worry only you can see your personal data.\nNo one else will be able to see it.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'serif',
+                  fontFamily: 'Montserrat',
                   fontSize: 16,
                   color: Colors.grey,
                 ),
@@ -117,7 +131,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Name', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Name',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              )),
           const SizedBox(height: 8),
           TextField(
             decoration: _inputDecoration('Name', 'John Doe'),
@@ -128,7 +147,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
           const Text(
             'Phone Number',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 8),
           TextField(
@@ -145,7 +168,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
 
           // NEU: Straße
-          const Text('Straße', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Straße',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              )),
           const SizedBox(height: 8),
           TextField(
             controller: _streetController,
@@ -157,7 +185,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
 
           // NEU: Hausnummer
-          const Text('Hausnummer', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Hausnummer',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              )),
           const SizedBox(height: 8),
           TextField(
             controller: _houseNumberController,
@@ -169,7 +202,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
 
           // NEU: Postleitzahl
-          const Text('Postleitzahl', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Postleitzahl',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              )),
           const SizedBox(height: 8),
           TextField(
             keyboardType: TextInputType.number,
@@ -182,7 +220,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 25),
 
           // NEU: Land
-          const Text('Land', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Land',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              )),
           const SizedBox(height: 8),
           TextField(
             controller: _countryController,
@@ -193,15 +236,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 25),
 
-          const Text('Gender', style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text('Gender',
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              )),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             decoration: _inputDecoration('Select', ''),
             value: selectedGender,
-            items:
-                ['Männlich', 'Weiblich'].map((gender) {
-                  return DropdownMenuItem(value: gender, child: Text(gender));
-                }).toList(),
+            items: ['Männlich', 'Weiblich']
+                .map((gender) => DropdownMenuItem(value: gender, child: Text(gender)))
+                .toList(),
             onChanged: (value) {
               setState(() {
                 selectedGender = value;
@@ -222,7 +269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: Colors.brown,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(35),
           ),
         ),
         onPressed: () {
@@ -234,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
-            fontFamily: 'serif',
+            fontFamily: 'Montserrat',
           ),
         ),
       ),
@@ -280,10 +327,7 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
     if (user == null) return;
 
     final snapshot =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
 
     if (snapshot.exists && snapshot.data()!.containsKey('kontostand')) {
       setState(() {
@@ -320,7 +364,10 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
       children: [
         Text(
           'Kontostand: ${_kontostand.toStringAsFixed(2)} €',
-          style: const TextStyle(fontSize: 20),
+          style: const TextStyle(
+            fontSize: 20,
+            fontFamily: 'Montserrat',
+          ),
         ),
         const SizedBox(height: 10),
         Row(
@@ -341,6 +388,10 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
             ),
             const SizedBox(width: 10),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.brown,
+                foregroundColor: Colors.white
+              ),
               onPressed: _geldHinzufuegen,
               child: const Text('Hinzufügen'),
             ),

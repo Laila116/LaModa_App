@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../Widgets/arrow_back.dart';
+// import '../Widgets/arrow_back.dart'; // Nicht mehr gebraucht
 import 'reviews.dart'; // Entfernen, falls nicht benötigt
 
 class MyOrders extends StatefulWidget {
@@ -81,7 +81,6 @@ class _MyOrdersState extends State<MyOrders> {
         orders = [];
         isLoading = false;
       });
-      // Optional: Fehler loggen
       print('Fehler beim Laden der Bestellungen: $e');
     }
   }
@@ -89,29 +88,53 @@ class _MyOrdersState extends State<MyOrders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: arrowBackAppBar(context, title: 'My Orders'),
       backgroundColor: Colors.white,
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : orders.isEmpty
-              ? const Center(child: Text("Keine Bestellungen gefunden."))
-              : ListView.builder(
-                  itemCount: orders.length,
-                  itemBuilder: (_, index) {
-                    final order = orders[index];
-                    return Column(
-                      children: order.items
-                          .map((item) => Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  OrderTile(item: item),
-                                  const Divider(),
-                                ],
-                              ))
-                          .toList(),
-                    );
-                  },
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              const Center(
+                child: Text(
+                  'My Orders',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
                 ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : orders.isEmpty
+                        ? const Center(child: Text("Keine Bestellungen gefunden."))
+                        : ListView.builder(
+                            itemCount: orders.length,
+                            itemBuilder: (_, index) {
+                              final order = orders[index];
+                              return Column(
+                                children: order.items
+                                    .map((item) => Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            OrderTile(item: item),
+                                            const Divider(),
+                                          ],
+                                        ))
+                                    .toList(),
+                              );
+                            },
+                          ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -145,7 +168,12 @@ class OrderTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: item.image.isNotEmpty
-          ? Image.asset(item.image, width: 60, height: 60, fit: BoxFit.cover)
+          ? Image.asset(
+              item.image,
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+            )
           : const SizedBox(
               width: 60,
               height: 60,
