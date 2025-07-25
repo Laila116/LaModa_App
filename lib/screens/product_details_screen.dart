@@ -3,21 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../Widgets/arrow_back.dart';
+import '../services/wishlist_service.dart';
 
 class ProductDetails extends StatefulWidget {
-  /// Titel des Produkts
   final String name;
-
-  /// Preis als String
   final String price;
-
-  /// Stern-Rating, z.B. 4.5
   final double rating;
-
-  /// Pfad zum lokalen Asset oder Netzbild-URL
   final String imagePath;
-
-  /// Farbe für das Herz-Icon
   final Color favoriteColor;
 
   const ProductDetails({
@@ -36,9 +28,6 @@ class ProductDetails extends StatefulWidget {
 class _ProductDetailsState extends State<ProductDetails> {
   final List<String> sizes = ['S', 'M', 'L', 'XL'];
   String selectedSize = 'M';
-  bool isFavorite = false;
-
-  // Available colors and currently selected color
   final List<Color> colors = [
     Colors.brown,
     Colors.black,
@@ -46,6 +35,51 @@ class _ProductDetailsState extends State<ProductDetails> {
     Colors.orange,
   ];
   Color _selectedColor = Colors.brown;
+
+  final WishlistService _wishlistService = WishlistService();
+  bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfInWishlist();
+  }
+
+  void checkIfInWishlist() {
+    final product = {
+      'title': widget.name,
+      'price': widget.price,
+      'rating': widget.rating,
+      'image': widget.imagePath,
+    };
+    setState(() {
+      isFavorite = _wishlistService.isInWishlist(product);
+    });
+  }
+
+  void toggleWishlist() {
+    final product = {
+      'title': widget.name,
+      'price': widget.price,
+      'rating': widget.rating,
+      'image': widget.imagePath,
+    };
+
+    setState(() {
+      if (isFavorite) {
+        _wishlistService.removeFromWishlist(product);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Von der Wunschliste entfernt')),
+        );
+      } else {
+        _wishlistService.addToWishlist(product);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Zur Wunschliste hinzugefügt')),
+        );
+      }
+      isFavorite = !isFavorite;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,20 +96,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: widget.imagePath.startsWith('http')
-                          ? Image.network(
-                              widget.imagePath,
-                              width: MediaQuery.of(context).size.width,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset(
-                              widget.imagePath,
-                              width: MediaQuery.of(context).size.width,
-                              fit: BoxFit.cover,
-                            ),
-                    ),
+                    child: widget.imagePath.startsWith('http')
+                        ? Image.network(widget.imagePath,
+                            width: double.infinity, fit: BoxFit.cover)
+                        : Image.asset(widget.imagePath,
+                            width: double.infinity, fit: BoxFit.cover),
                   ),
                   Positioned(
                     top: 12,
@@ -88,39 +113,22 @@ class _ProductDetailsState extends State<ProductDetails> {
                           isFavorite
                               ? Icons.favorite
                               : Icons.favorite_border_rounded,
-                          color: isFavorite ? Colors.brown : Colors.brown,
+                          color: widget.favoriteColor,
                         ),
-                        onPressed: () {
-                          setState(() {
-                            isFavorite = !isFavorite;
-                          });
-                        },
+                        onPressed: toggleWishlist,
                       ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-
-              // Title & description
-              Text(
-                widget.name,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
+              Text(widget.name,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Text(
-                    widget.price,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  Text(widget.price, style: const TextStyle(fontSize: 20)),
                   const Spacer(),
                   const Icon(Icons.star, size: 20, color: Colors.amber),
                   const SizedBox(width: 4),
@@ -129,26 +137,24 @@ class _ProductDetailsState extends State<ProductDetails> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Here are the details of the brown jacket. It is stylish and comfortable.',
-                style: TextStyle(fontSize: 16, color: Colors.black87),
+                'Hier sind die Details zum Produkt. Modisch, bequem und hochwertig.',
+                style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 24),
 
               // Size selector
-              const Text('Select Size', style: TextStyle(fontSize: 18)),
+              const Text('Größe auswählen', style: TextStyle(fontSize: 18)),
               const SizedBox(height: 8),
               Row(
                 children: sizes.map((size) {
-                  final bool isSelected = size == selectedSize;
+                  final isSelected = size == selectedSize;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: ChoiceChip(
                       label: Text(size),
                       selected: isSelected,
                       onSelected: (_) {
-                        setState(() {
-                          selectedSize = size;
-                        });
+                        setState(() => selectedSize = size);
                       },
                       selectedColor: Colors.brown,
                       backgroundColor: Colors.grey.shade200,
@@ -161,8 +167,8 @@ class _ProductDetailsState extends State<ProductDetails> {
               ),
               const SizedBox(height: 24),
 
-              // Color dropdown
-              const Text('Select Color', style: TextStyle(fontSize: 18)),
+              // Color selector
+              const Text('Farbe auswählen', style: TextStyle(fontSize: 18)),
               const SizedBox(height: 8),
               DropdownButton<Color>(
                 value: _selectedColor,
@@ -182,31 +188,24 @@ class _ProductDetailsState extends State<ProductDetails> {
                 }).toList(),
                 onChanged: (Color? newColor) {
                   if (newColor != null) {
-                    setState(() {
-                      _selectedColor = newColor;
-                    });
+                    setState(() => _selectedColor = newColor);
                   }
                 },
               ),
-              const SizedBox(height: 24),
-
-              // Display selections
-              Text(
-                'Selected Size: $selectedSize',
-                style: const TextStyle(fontSize: 16),
-              ),
+              const SizedBox(height: 16),
+              Text('Gewählte Größe: $selectedSize',
+                  style: const TextStyle(fontSize: 16)),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Text(
-                    'Selected Color: ',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  const Text('Gewählte Farbe: ',
+                      style: TextStyle(fontSize: 16)),
                   Container(width: 24, height: 24, color: _selectedColor),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
+              // Add to cart
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -220,10 +219,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                         .collection('items')
                         .add({
                       'name': widget.name,
-                      'price': double.tryParse(
-                            widget.price.replaceAll(' €', ''),
-                          ) ??
-                          0,
+                      'price': double.tryParse(widget.price.replaceAll(' €', '')) ?? 0,
                       'quantity': 1,
                       'size': selectedSize,
                       'image': widget.imagePath,
@@ -231,25 +227,16 @@ class _ProductDetailsState extends State<ProductDetails> {
                     });
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Zum Warenkorb hinzugefügt')),
+                      const SnackBar(
+                          content: Text('Zum Warenkorb hinzugefügt')),
                     );
                   },
-                  icon: const Icon(
-                    Icons.shopping_bag,
-                    size: 28,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Add to Cart',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontFamily: 'Roboto',
-                    ),
-                  ),
+                  icon: const Icon(Icons.shopping_bag, color: Colors.white),
+                  label: const Text('In den Warenkorb',
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.brown,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -259,13 +246,11 @@ class _ProductDetailsState extends State<ProductDetails> {
 
               const SizedBox(height: 30),
 
-              const Text(
-                'Customer Reviews',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+              const Text('Bewertungen',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               const Divider(),
 
-              // Review List
+              // Customer Reviews
               StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('reviews')

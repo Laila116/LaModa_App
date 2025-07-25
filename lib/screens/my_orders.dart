@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Widgets/arrow_back.dart';
-import 'reviews.dart'; // Kannst du entfernen, wenn du Reviews hier nicht mehr brauchst
+import 'reviews.dart'; // Entfernen, falls nicht benötigt
 
 class MyOrders extends StatefulWidget {
   const MyOrders({super.key});
@@ -23,33 +23,67 @@ class _MyOrdersState extends State<MyOrders> {
 
   Future<void> loadOrders() async {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      setState(() {
+        orders = [];
+        isLoading = false;
+      });
+      return;
+    }
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('orders')
-        .where('userId', isEqualTo: user.uid)
-        .orderBy('timestamp', descending: true)
-        .get();
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('userId', isEqualTo: user.uid)
+          .orderBy('timestamp', descending: true)
+          .get();
 
-    final fetchedOrders = snapshot.docs.map((doc) {
-      final data = doc.data();
-      final items = (data['items'] as List).map((item) {
-        return OrderItem(
-          name: item['name'],
-          size: item['size'],
-          quantity: item['quantity'],
-          price: (item['price'] as num).toDouble(),
-          image: item['image'],
-        );
+      final fetchedOrders = snapshot.docs.map((doc) {
+        final data = doc.data();
+
+        // Absichern, dass 'items' existiert und eine Liste ist
+        final itemsRaw = data['items'];
+        if (itemsRaw == null || itemsRaw is! List) {
+          return Order(items: []);
+        }
+
+        final items = itemsRaw.map<OrderItem?>((item) {
+          if (item is Map<String, dynamic>) {
+            try {
+              return OrderItem(
+                name: item['name'] ?? 'Unknown',
+                size: item['size'] ?? 'N/A',
+                quantity: (item['quantity'] is int)
+                    ? item['quantity'] as int
+                    : int.tryParse(item['quantity'].toString()) ?? 1,
+                price: (item['price'] is num)
+                    ? (item['price'] as num).toDouble()
+                    : double.tryParse(item['price'].toString()) ?? 0.0,
+                image: item['image'] ?? '',
+              );
+            } catch (e) {
+              return null;
+            }
+          }
+          return null;
+        }).whereType<OrderItem>().toList();
+
+        return Order(items: items);
       }).toList();
 
-      return Order(items: items);
-    }).toList();
-
-    setState(() {
-      orders = fetchedOrders;
-      isLoading = false;
-    });
+      setState(() {
+        orders = fetchedOrders;
+        isLoading = false;
+      });
+    } catch (e) {
+      // Fehler abfangen
+      setState(() {
+        orders = [];
+        isLoading = false;
+      });
+      // Optional: Fehler loggen
+      print('Fehler beim Laden der Bestellungen: $e');
+    }
   }
 
   @override
@@ -71,7 +105,6 @@ class _MyOrdersState extends State<MyOrders> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   OrderTile(item: item),
-                                  // ReviewList entfernt!
                                   const Divider(),
                                 ],
                               ))
@@ -111,7 +144,13 @@ class OrderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Image.asset(item.image, width: 60, height: 60, fit: BoxFit.cover),
+      leading: item.image.isNotEmpty
+          ? Image.asset(item.image, width: 60, height: 60, fit: BoxFit.cover)
+          : const SizedBox(
+              width: 60,
+              height: 60,
+              child: Icon(Icons.image_not_supported),
+            ),
       title: Text(item.name),
       subtitle: Text('Size: ${item.size} | Qty: ${item.quantity}'),
       trailing: Row(
@@ -122,7 +161,7 @@ class OrderTile extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.brown,
-              foregroundColor: Colors.white
+              foregroundColor: Colors.white,
             ),
             child: const Text("Review"),
             onPressed: () {
