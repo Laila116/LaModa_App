@@ -14,6 +14,21 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String? selectedGender;
 
+  // Neue TextEditingController für Adressfelder
+  final TextEditingController _streetController = TextEditingController();
+  final TextEditingController _houseNumberController = TextEditingController();
+  final TextEditingController _postalCodeController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
+
+  @override
+  void dispose() {
+    _streetController.dispose();
+    _houseNumberController.dispose();
+    _postalCodeController.dispose();
+    _countryController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Textfelder und Dropdown
+  // Textfelder und Dropdown inklusive Adressfelder
   Widget _buildFormFields() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -128,6 +143,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           ),
           const SizedBox(height: 25),
+
+          // NEU: Straße
+          const Text('Straße', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _streetController,
+            decoration: _inputDecoration('Straße', 'Musterstraße'),
+            onChanged: (value) {
+              print('Straße geändert: $value');
+            },
+          ),
+          const SizedBox(height: 25),
+
+          // NEU: Hausnummer
+          const Text('Hausnummer', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _houseNumberController,
+            decoration: _inputDecoration('Hausnummer', '12A'),
+            onChanged: (value) {
+              print('Hausnummer geändert: $value');
+            },
+          ),
+          const SizedBox(height: 25),
+
+          // NEU: Postleitzahl
+          const Text('Postleitzahl', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          TextField(
+            keyboardType: TextInputType.number,
+            controller: _postalCodeController,
+            decoration: _inputDecoration('Postleitzahl', '12345'),
+            onChanged: (value) {
+              print('Postleitzahl geändert: $value');
+            },
+          ),
+          const SizedBox(height: 25),
+
+          // NEU: Land
+          const Text('Land', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _countryController,
+            decoration: _inputDecoration('Land', 'Deutschland'),
+            onChanged: (value) {
+              print('Land geändert: $value');
+            },
+          ),
+          const SizedBox(height: 25),
+
           const Text('Gender', style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
@@ -162,6 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         onPressed: () {
           print('Profil abgeschlossen');
+          // Hier kannst du z.B. speichern implementieren
         },
         child: const Text(
           'Complete Profile',
@@ -242,7 +308,7 @@ class _GeldHinzufuegenWidgetState extends State<GeldHinzufuegenWidget> {
       }, SetOptions(merge: true));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bitte gib einen gültigen Betrag ein.')),
+        const SnackBar(content: Text('Bitte gib einen gültigen Betrag ein.')),
       );
     }
   }

@@ -22,10 +22,10 @@ class _ReviewsState extends State<Reviews> {
           .doc(widget.orderId)
           .collection('reviews')
           .add({
-        'rating': _rating,
-        'comment': _reviewController.text.trim(),
-        'timestamp': FieldValue.serverTimestamp(),
-      });
+            'rating': _rating,
+            'comment': _reviewController.text.trim(),
+            'timestamp': FieldValue.serverTimestamp(),
+          });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Review submitted successfully")),
@@ -34,9 +34,9 @@ class _ReviewsState extends State<Reviews> {
       Navigator.pop(context);
     } catch (e) {
       print("Fehler beim Senden der Bewertung: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to submit review")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to submit review")));
     }
   }
 
@@ -88,8 +88,8 @@ class _ReviewsState extends State<Reviews> {
               ),
               const SizedBox(height: 10),
               RatingBar.builder(
-                itemBuilder: (context, _) =>
-                    const Icon(Icons.star, color: Colors.amber),
+                itemBuilder:
+                    (context, _) => const Icon(Icons.star, color: Colors.amber),
                 onRatingUpdate: (value) {
                   setState(() {
                     _rating = value;
