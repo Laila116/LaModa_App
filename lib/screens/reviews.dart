@@ -9,6 +9,7 @@ class Reviews extends StatefulWidget {
 
   const Reviews({super.key, required this.item});
 
+
   @override
   State<Reviews> createState() => _ReviewsState();
 }
@@ -19,20 +20,28 @@ class _ReviewsState extends State<Reviews> {
 
   Future<void> submitReview() async {
     try {
-      await FirebaseFirestore.instance.collection('reviews').add({
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(widget.orderId)
+          .collection('reviews')
+          .add({
         'rating': _rating,
-        'reviewText': _reviewController.text,
+        'comment': _reviewController.text.trim(),
         'timestamp': FieldValue.serverTimestamp(),
+
         'name': widget.item.name,
         'size': widget.item.size,
         'quantity': widget.item.quantity,
         'price': widget.item.price,
         'image': widget.item.image,
+
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Review submitted successfully")),
       );
+
+
       Navigator.pop(context);
     } catch (e) {
       print("Fehler beim Senden der Bewertung: $e");
@@ -78,6 +87,7 @@ class _ReviewsState extends State<Reviews> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+
               ReviewItemTile(
                 name: widget.item.name,
                 size: widget.item.size,
@@ -86,11 +96,12 @@ class _ReviewsState extends State<Reviews> {
                 image: widget.item.image,
               ),
               const SizedBox(height: 10),
+
               const Text(
                 "How is your order?",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
               ),
-              const Divider(),
+              const Divider(height: 30),
               const Text(
                 "Your overall rating",
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
@@ -115,13 +126,13 @@ class _ReviewsState extends State<Reviews> {
               TextField(
                 controller: _reviewController,
                 maxLines: 4,
+
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  hintText: "Enter here",
+                  hintText: "Write something about your order...",
                 ),
               ),
-              const Divider(),
-              const SizedBox(height: 30),
+              const Divider(height: 40),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -129,7 +140,7 @@ class _ReviewsState extends State<Reviews> {
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey[200],
-                      fixedSize: const Size(190, 50),
+                      fixedSize: const Size(160, 50),
                     ),
                     child: const Text(
                       "Cancel",
@@ -140,7 +151,7 @@ class _ReviewsState extends State<Reviews> {
                     onPressed: submitReview,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.brown,
-                      fixedSize: const Size(190, 50),
+                      fixedSize: const Size(160, 50),
                     ),
                     child: const Text(
                       "Submit",

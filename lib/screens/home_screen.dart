@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import '../Widgets/clothing_categories_screen.dart';
+import '../Widgets/clothing_categories.dart';
 import '../Widgets/navigationsBar.dart';
 import '../Widgets/product_card.dart';
 import '../services/auth_service.dart';
@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        // Logo LINKS
+        // logo LINKS
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: GestureDetector(
@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (context) => const HomeScreen()),
               );
             },
-            child: Image.asset('assets/Logo/favicon3-32x32.png', height: 38),
+            child: Image.asset('assets/logo/favicon-32x32.png', height: 38),
           ),
         ),
         // (Optional:) Titel in die Mitte

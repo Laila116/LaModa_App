@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Widgets/arrow_back.dart';
 import 'reviews.dart'; // Kannst du entfernen, wenn du Reviews hier nicht mehr brauchst
@@ -12,18 +14,23 @@ class MyOrders extends StatefulWidget {
 }
 
 class _MyOrdersState extends State<MyOrders> {
+
   List<Order> orders = [];
   bool isLoading = true;
+
 
   @override
   void initState() {
     super.initState();
+
     loadOrders();
+
   }
 
   Future<void> loadOrders() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+
 
     final snapshot = await FirebaseFirestore.instance
         .collection('orders')
@@ -52,8 +59,11 @@ class _MyOrdersState extends State<MyOrders> {
     });
   }
 
+   
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: arrowBackAppBar(context, title: 'My Orders'),
       backgroundColor: Colors.white,
