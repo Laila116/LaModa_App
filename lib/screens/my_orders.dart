@@ -120,6 +120,10 @@ class OrderTile extends StatelessWidget {
           Text('€${item.price.toStringAsFixed(2)}'),
           const SizedBox(width: 10),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.brown,
+              foregroundColor: Colors.white
+            ),
             child: const Text("Review"),
             onPressed: () {
               Navigator.push(
