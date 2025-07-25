@@ -31,6 +31,8 @@ dependencies:
   flutter_feather_icons: ^2.0.0
   carousel_slider: ^5.0.0
   flutter_rating_bar: ^4.0.1
+  mockito: ^5.4.0
+  build_runner: ^2.4.6
 
 
 
