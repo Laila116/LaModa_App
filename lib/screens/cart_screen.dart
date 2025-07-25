@@ -88,8 +88,8 @@ class _CartScreenState extends State<CartScreen> {
                   (sum, item) => sum + (item.price * item.quantity),
                 );
                 double deliveryFee = 25.0;
-                double discount = 35.0;
-                double total = subtotal + deliveryFee - discount;
+                //double discount = 35.0;
+                double total = subtotal + deliveryFee /*- discount*/;
 
                 return Column(
                   children: [
@@ -144,7 +144,7 @@ class _CartScreenState extends State<CartScreen> {
                                           item.docId,
                                           item.quantity - 1,
                                         ),
-                                    color: primaryColor,
+                                    color: Colors.white,
                                   ),
                                   Text('${item.quantity}'),
                                   IconButton(
@@ -156,6 +156,57 @@ class _CartScreenState extends State<CartScreen> {
                                           item.quantity + 1,
                                         ),
                                     color: primaryColor,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.brown,
+                                    ),
+                                    tooltip: 'Löschen',
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder:
+                                            (_) => AlertDialog(
+                                              title: const Text(
+                                                'Wirklich löschen?',
+                                              ),
+                                              content: const Text(
+                                                'Willst du dieses Produkt aus dem Warenkorb entfernen?',
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed:
+                                                      () =>
+                                                          Navigator.of(
+                                                            context,
+                                                          ).pop(),
+                                                  child: const Text(
+                                                    'Abbrechen',
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    removeItem(
+                                                      user.uid,
+                                                      item.docId,
+                                                    );
+                                                  },
+                                                  child: const Text(
+                                                    'Löschen',
+                                                    style: TextStyle(
+                                                      color: Colors.brown,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
@@ -170,8 +221,8 @@ class _CartScreenState extends State<CartScreen> {
                       child: Column(
                         children: [
                           summaryRow('Sub-Total', subtotal),
-                          summaryRow('Delivery Fee', deliveryFee),
-                          summaryRow('Discount', -discount),
+                          summaryRow('Delivery ', deliveryFee),
+                          // summaryRow('Discount', -discount),
                           const Divider(),
                           summaryRow('Total Cost', total, bold: true),
                           summaryRow('Guthaben', kontostand, bold: true),
