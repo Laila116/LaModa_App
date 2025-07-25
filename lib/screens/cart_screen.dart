@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../Widgets/arrow_back.dart';
 
 class CartScreen extends StatefulWidget {
@@ -26,38 +25,32 @@ class _CartScreenState extends State<CartScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('carts')
-            .doc(user.uid)
-            .collection('items')
-            .orderBy('timestamp', descending: true)
-            .get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('carts')
+        .doc(user.uid)
+        .collection('items')
+        .orderBy('timestamp', descending: true)
+        .get();
 
-    final items =
-        snapshot.docs.map((doc) {
-          final data = doc.data();
-          return CartItem(
-            name: data['name'],
-            price: (data['price'] as num).toDouble(),
-            size: data['size'],
-            quantity: data['quantity'],
-            image: data['image'],
-          );
-        }).toList();
+    final items = snapshot.docs.map((doc) {
+      final data = doc.data();
+      return CartItem(
+        name: data['name'],
+        price: (data['price'] as num).toDouble(),
+        size: data['size'],
+        quantity: data['quantity'],
+        image: data['image'],
+      );
+    }).toList();
 
-    setState(() {
-      cartItems = items;
-    });
-
-    final userDoc =
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
 
     if (userDoc.exists && userDoc.data()!.containsKey('kontostand')) {
       setState(() {
+        cartItems = items;
         kontostand = (userDoc['kontostand'] as num).toDouble();
       });
     }
@@ -75,14 +68,13 @@ class _CartScreenState extends State<CartScreen> {
       cartItems[index].quantity = newQuantity;
     });
 
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('carts')
-            .doc(user.uid)
-            .collection('items')
-            .where('name', isEqualTo: item.name)
-            .where('size', isEqualTo: item.size)
-            .get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('carts')
+        .doc(user.uid)
+        .collection('items')
+        .where('name', isEqualTo: item.name)
+        .where('size', isEqualTo: item.size)
+        .get();
 
     for (var doc in snapshot.docs) {
       doc.reference.update({'quantity': newQuantity});
@@ -95,14 +87,13 @@ class _CartScreenState extends State<CartScreen> {
 
     final item = cartItems[index];
 
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection('carts')
-            .doc(user.uid)
-            .collection('items')
-            .where('name', isEqualTo: item.name)
-            .where('size', isEqualTo: item.size)
-            .get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('carts')
+        .doc(user.uid)
+        .collection('items')
+        .where('name', isEqualTo: item.name)
+        .where('size', isEqualTo: item.size)
+        .get();
 
     for (var doc in snapshot.docs) {
       await doc.reference.delete();
@@ -115,10 +106,7 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double subtotal = cartItems.fold(
-      0,
-      (sum, item) => sum + (item.price * item.quantity),
-    );
+    double subtotal = cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
     double deliveryFee = 25.0;
     double discount = 35.0;
     double total = subtotal + deliveryFee - discount;
@@ -149,17 +137,10 @@ class _CartScreenState extends State<CartScreen> {
                       width: 64,
                       height: 64,
                       fit: BoxFit.cover,
-                      errorBuilder:
-                          (context, error, stackTrace) =>
-                              Icon(Icons.broken_image),
+                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
                     ),
-                    title: Text(
-                      item.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      'Size: ${item.size} | €${item.price.toStringAsFixed(2)}',
-                    ),
+                    title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('Size: ${item.size} | €${item.price.toStringAsFixed(2)}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -192,7 +173,6 @@ class _CartScreenState extends State<CartScreen> {
                 const Divider(),
                 summaryRow('Total Cost', total, bold: true),
                 summaryRow('Guthaben', kontostand, bold: true),
-
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -201,44 +181,34 @@ class _CartScreenState extends State<CartScreen> {
                       final user = FirebaseAuth.instance.currentUser;
                       if (user == null) return;
 
-                      // Berechne Total
-                      double subtotal = cartItems.fold(
-                        0,
-                        (sum, item) => sum + (item.price * item.quantity),
-                      );
-                      double deliveryFee = 25.0;
-                      double discount = 35.0;
-                      double total = subtotal + deliveryFee - discount;
-
-                      // Lade Guthaben
-                      final userDoc =
-                          await FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(user.uid)
-                              .get();
-                      double kontostand = 0.0;
-
-                      if (userDoc.exists &&
-                          userDoc.data()!.containsKey('kontostand')) {
-                        kontostand =
-                            (userDoc.data()!['kontostand'] as num).toDouble();
-                      }
-
                       if (kontostand >= total) {
-                        // Guthaben reicht – abziehen
                         final neuerStand = kontostand - total;
                         await FirebaseFirestore.instance
                             .collection('users')
                             .doc(user.uid)
                             .update({'kontostand': neuerStand});
 
+                        // Bestellung speichern
+                        final ordersCollection = FirebaseFirestore.instance.collection('orders');
+                        await ordersCollection.add({
+                          'userId': user.uid,
+                          'timestamp': FieldValue.serverTimestamp(),
+                          'total': total,
+                          'items': cartItems.map((item) => {
+                            'name': item.name,
+                            'price': item.price,
+                            'size': item.size,
+                            'quantity': item.quantity,
+                            'image': item.image,
+                          }).toList(),
+                        });
+
                         // Warenkorb leeren
-                        final itemsSnapshot =
-                            await FirebaseFirestore.instance
-                                .collection('carts')
-                                .doc(user.uid)
-                                .collection('items')
-                                .get();
+                        final itemsSnapshot = await FirebaseFirestore.instance
+                            .collection('carts')
+                            .doc(user.uid)
+                            .collection('items')
+                            .get();
 
                         for (var doc in itemsSnapshot.docs) {
                           await doc.reference.delete();
@@ -249,37 +219,25 @@ class _CartScreenState extends State<CartScreen> {
                         });
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Checkout erfolgreich!'),
-                          ),
+                          const SnackBar(content: Text('Checkout erfolgreich!')),
                         );
 
-                        // Danach zeige Dialog
                         await showDialog(
                           context: context,
-                          builder:
-                              (_) => AlertDialog(
-                                title: const Text('Erfolg!'),
-                                content: const Text(
-                                  'Deine Bestellung wurde erfolgreich aufgegeben.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.of(context).pop(),
-                                    child: const Text('OK'),
-                                  ),
-                                ],
+                          builder: (_) => AlertDialog(
+                            title: const Text('Erfolg!'),
+                            content: const Text('Deine Bestellung wurde erfolgreich aufgegeben.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('OK'),
                               ),
+                            ],
+                          ),
                         );
                       } else {
-                        // Nicht genug Geld
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Nicht genug Guthaben: €${kontostand.toStringAsFixed(2)}',
-                            ),
-                          ),
+                          SnackBar(content: Text('Nicht genug Guthaben: €${kontostand.toStringAsFixed(2)}')),
                         );
                       }
                     },
@@ -292,11 +250,7 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                     child: const Text(
                       'Proceed to Checkout',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontFamily: 'Roboto',
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
                 ),
