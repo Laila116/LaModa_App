@@ -64,21 +64,19 @@ class _ProductDetailsState extends State<ProductDetails> {
                     borderRadius: BorderRadius.circular(20),
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
-                      child:
-                          widget.imagePath.startsWith('http')
-                              ? Image.network(
-                                widget.imagePath,
-                                width: MediaQuery.of(context).size.width,
-                                fit: BoxFit.cover,
-                              )
-                              : Image.asset(
-                                widget.imagePath,
-                                width: MediaQuery.of(context).size.width,
-                                fit: BoxFit.cover,
-                              ),
+                      child: widget.imagePath.startsWith('http')
+                          ? Image.network(
+                              widget.imagePath,
+                              width: MediaQuery.of(context).size.width,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              widget.imagePath,
+                              width: MediaQuery.of(context).size.width,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
-
                   Positioned(
                     top: 12,
                     right: 12,
@@ -140,27 +138,26 @@ class _ProductDetailsState extends State<ProductDetails> {
               const Text('Select Size', style: TextStyle(fontSize: 18)),
               const SizedBox(height: 8),
               Row(
-                children:
-                    sizes.map((size) {
-                      final bool isSelected = size == selectedSize;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ChoiceChip(
-                          label: Text(size),
-                          selected: isSelected,
-                          onSelected: (_) {
-                            setState(() {
-                              selectedSize = size;
-                            });
-                          },
-                          selectedColor: Colors.brown,
-                          backgroundColor: Colors.grey.shade200,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black87,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                children: sizes.map((size) {
+                  final bool isSelected = size == selectedSize;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: ChoiceChip(
+                      label: Text(size),
+                      selected: isSelected,
+                      onSelected: (_) {
+                        setState(() {
+                          selectedSize = size;
+                        });
+                      },
+                      selectedColor: Colors.brown,
+                      backgroundColor: Colors.grey.shade200,
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 24),
 
@@ -169,21 +166,20 @@ class _ProductDetailsState extends State<ProductDetails> {
               const SizedBox(height: 8),
               DropdownButton<Color>(
                 value: _selectedColor,
-                items:
-                    colors.map((Color color) {
-                      return DropdownMenuItem<Color>(
-                        value: color,
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                items: colors.map((Color color) {
+                  return DropdownMenuItem<Color>(
+                    value: color,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }).toList(),
                 onChanged: (Color? newColor) {
                   if (newColor != null) {
                     setState(() {
@@ -210,6 +206,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 ],
               ),
               const SizedBox(height: 16),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -222,20 +219,19 @@ class _ProductDetailsState extends State<ProductDetails> {
                         .doc(user.uid)
                         .collection('items')
                         .add({
-                          'name': widget.name,
-                          'price':
-                              double.tryParse(
-                                widget.price.replaceAll(' €', ''),
-                              ) ??
-                              0,
-                          'quantity': 1,
-                          'size': selectedSize,
-                          'image': widget.imagePath,
-                          'timestamp': FieldValue.serverTimestamp(),
-                        });
+                      'name': widget.name,
+                      'price': double.tryParse(
+                            widget.price.replaceAll(' €', ''),
+                          ) ??
+                          0,
+                      'quantity': 1,
+                      'size': selectedSize,
+                      'image': widget.imagePath,
+                      'timestamp': FieldValue.serverTimestamp(),
+                    });
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Zum Warenkorb hinzugefügt')),
+                      const SnackBar(content: Text('Zum Warenkorb hinzugefügt')),
                     );
                   },
                   icon: const Icon(
@@ -259,6 +255,56 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ),
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                'Customer Reviews',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const Divider(),
+
+              // Review List
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('reviews')
+                    .where('name', isEqualTo: widget.name)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Text('Keine Bewertungen vorhanden.'),
+                    );
+                  }
+
+                  final reviews = snapshot.data!.docs;
+
+                  return Column(
+                    children: reviews.map((doc) {
+                      final data = doc.data()! as Map<String, dynamic>;
+                      final rating = (data['rating'] ?? 0).toDouble();
+                      final reviewText = data['reviewText'] ?? "";
+
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        color: Colors.grey[100],
+                        child: ListTile(
+                          leading: const Icon(Icons.star, color: Colors.amber),
+                          title: Text('Bewertung: $rating'),
+                          subtitle: Text(reviewText),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
               ),
             ],
           ),
