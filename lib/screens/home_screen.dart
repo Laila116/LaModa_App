@@ -1,5 +1,5 @@
-
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -58,7 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        // logo LINKS
         leading: Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: GestureDetector(
@@ -71,25 +70,57 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset('assets/logo/favicon-32x32.png', height: 38),
           ),
         ),
-        // (Optional:) Titel in die Mitte
         title: const Text('LaModa', style: TextStyle(color: Colors.brown)),
-        // oder null
         centerTitle: true,
-        // Icons RECHTS
+
+        // Hier der entscheidende Part mit StreamBuilder:
         actions: [
-          IconButton(
-            icon: Icon(Icons.person, color: Colors.brown),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-              );
+          StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              final user = snapshot.data;
+
+              if (user == null) {
+                // Nicht angemeldet => Icon
+                return IconButton(
+                  icon: Icon(Icons.person, color: Colors.brown),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
+                  },
+                );
+              } else {
+                // Angemeldet => Name anzeigen (displayName oder email)
+                final displayName = user.displayName ?? user.email ?? 'User';
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ProfileScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        displayName,
+                        style: const TextStyle(
+                          color: Colors.brown,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
             },
           ),
           IconButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.brown),
-            ),
             icon: Icon(Icons.logout, color: Colors.brown),
             onPressed: () async {
               final shouldLogout = await showDialog<bool>(
@@ -129,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
               );
               if (shouldLogout == true) {
-                await authService.signOut(); // <-- Deine Methode!
+                await authService.signOut();
                 Navigator.of(context).pushReplacementNamed('/home');
               }
             },
@@ -145,7 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Ausgelagerter Home-Content für Übersichtlichkeit:
   Widget _buildHomeContent() {
     final sliderImages = [
       'assets/images/home_bild1.jpg',
@@ -235,7 +265,6 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
         ),
-
         Padding(
           padding: const EdgeInsets.all(12),
           child: StreamBuilder(
@@ -246,7 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               final products = snapshot.data!.docs;
@@ -255,10 +284,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   products.where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
 
-                    // Sicherheitsprüfung
                     if (!data.containsKey('name') ||
-                        !data.containsKey('category'))
+                        !data.containsKey('category')) {
                       return false;
+                    }
 
                     final name = doc['name'].toString().toLowerCase();
                     final categories = List<String>.from(data['category']);
@@ -266,6 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final matchesCategory =
                         selectedCategory.isEmpty ||
                         categories.contains(selectedCategory);
+
                     if (kDebugMode) {
                       print('Kategorie: $selectedCategory | Suche: $query');
                     }
@@ -274,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }).toList();
 
               if (filteredProducts.isEmpty) {
-                return Center(
+                return const Center(
                   child: Text(
                     'Keine Produkte gefunden',
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.w500),
