@@ -20,11 +20,16 @@ Le-Jean-Housene Dabo
 
 ## 📸 Screenshots
 
-![Home](assets/images/Home_EMA.jpg)
-![Meine Bestellung](assets/images/Order_EMA.jpg)
-![Login](assets/images/SignIn_EMA.jpg)
-![Produkt](assets/images/Produktdetails_EMA.jpg)
-![Wunschliste](assets/images/Wishliste.jpg)
+
+![Home]<img src="assets/images/Home_EMA.jpg" width="250">
+
+![Meine Bestellung]<img src="assets/images/Order_EMA.jpg" width="300">
+
+![Login]<img src="assets/images/SignIn_EMA.jpg" width="300">
+
+![Produkt]<img src="assets/images/Produktdetails_EMA.jpg" width="300">
+
+![Wunschliste]<img src="assets/images/Wishliste.jpg" width="300">
 
 
 
