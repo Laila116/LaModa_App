@@ -1,18 +1,38 @@
-# app02
+## LaModa – Shopping App (Flutter)
 
-A new Flutter project.
+Eine moderne Shopping-App für Kleidung verschiedener Altersgruppen.
+Entwickelt mit Flutter und Android Studio.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## 👤 Login Testzugang
 
-A few resources to get you started if this is your first Flutter project:
+Benutzername: test1
+Passwort: test123456
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Passwort-Vergessen-Funktion ist vollständig implementiert und funktioniert mit einer echten E-Mail-Adresse.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
 
-me
+## 👥 Team
+
+Laila Almejbel
+Le-Jean-Housene Dabo
+
+
+## 📸 Screenshots
+
+Startseite
+Login
+Produktseite
+
+
+
+## Features
+
+🏠 Home Page
+👕 Produktdetailseite
+❤️ Wunschliste (Wishlist)
+🛒 Warenkorb / Cart Page
+👤 Profil vervollständigen
+🔐 Login
+✏️ Registrieren
+✉️ Passwort vergessen (mit echter E-Mail-Adresse)
